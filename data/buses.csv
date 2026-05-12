@@ -1,0 +1,54 @@
+name,x,y,v_nom,region,description,island,bus_type
+04BABATNGN,124.8966993,11.39550084,138,Visayas,"Babatngon substation, Northern Leyte",Leyte,substation
+04CALBAYOG,124.6379129,12.05513914,138,Visayas,"Calbayog substation, Samar",Samar,substation
+04ISABEL,124.4489301,10.91933332,138,Visayas,"Isabel substation, Leyte (Leyte geothermal connection)",Leyte,substation
+04KANANGA,124.5513085,11.16499313,230,Visayas,"Kananga substation, Leyte",Leyte,substation
+04MAASIN,124.7791313,10.16255469,138,Visayas,"Maasin substation, Southern Leyte",Leyte,substation
+04ORMOC,124.6446783,11.08748498,350,Visayas,"Ormoc 350 kV substation, Leyte",Leyte,hvdc
+04PARANAS,125.0413517,11.76675071,138,Visayas,"Paranas substation, Samar",Samar,substation
+04STARITA,125.0020505,11.39500758,138,Visayas,"Santa Rita substation, Samar",Samar,substation
+04STARITATAP,125.0020505,11.39500758,138,Visayas,"Santa Rita tap substation, Samar",Samar,substation
+04TABANGO,124.3434864,11.32347232,230,Visayas,"Tabango substation, Northern Leyte",Leyte,substation
+04TONGONA,124.6375583,11.16131421,138,Visayas,"Tongonan geothermal plant substation, Leyte",Leyte,generator
+05CALUNG,123.6671074,10.41572975,138,Visayas,"Calung substation, Cebu",Cebu,substation
+05CEBU,123.9408559,10.36522781,138,Visayas,"Cebu main substation, Cebu City",Cebu,substation
+05COLON,123.7598772,10.22268355,138,Visayas,"Colon substation, Cebu City",Cebu,substation
+05COMPSTLA,124.0065977,10.46649795,230,Visayas,"Compostela substation, Cebu",Cebu,substation
+05DAANBNTAY,123.956809,11.14643391,230,Visayas,"Daan Bantayan substation, Cebu",Cebu,substation
+05DAANLUNSOD,123.956809,11.14643391,230,Visayas,"Daan Lungsod substation, Cebu",Cebu,substation
+05DUMANJUG,123.4405471,10.03617433,230,Visayas,"Dumanjug substation, Southern Cebu",Cebu,substation
+05KSPC,123.7626806,10.21827094,230,Visayas,"Kepco SPC power plant substation, Cebu City",Cebu,generator
+05LAPULAPU,123.9683067,10.32383347,230,Visayas,"Lapu-Lapu substation, Mactan Island, Cebu",Cebu,substation
+05MAGDUGO,123.665698,10.3457421,230,Visayas,"Magdugo substation, Cebu",Cebu,substation
+05MANDAUE,123.9639232,10.33472932,138,Visayas,"Mandaue substation, Mandaue City, Cebu",Cebu,substation
+05NAGA,123.7570366,10.2544303,138,Visayas,"Naga substation, Cebu",Cebu,substation
+05QUIOT,123.8561088,10.28792262,138,Visayas,"Quiot substation, Cebu City",Cebu,substation
+05SAMBOAN,123.3117005,9.552394872,138,Visayas,"Samboan substation, Southern Cebu",Cebu,substation
+05THERMA,123.6351288,10.35856192,138,Visayas,"Therma Visayas power plant substation, Cebu",Cebu,generator
+05TOLBESS,123.6656658,10.34594264,138,Visayas,"Toledo BESS substation, Cebu",Cebu,bess
+05TOLEDO,123.6656658,10.34594264,138,Visayas,"Toledo substation, Cebu (copper smelter area)",Cebu,substation
+06AMLAN,123.2248121,9.457756504,138,Visayas,"Amlan substation, Negros Oriental",Negros,substation
+06BACOLOD,123.1145906,10.67627032,230,Visayas,"Bacolod substation, Bacolod City, Negros Occidental",Negros,substation
+06CADIZ,123.2882465,10.93482221,230,Visayas,"Cadiz substation, Negros Occidental",Negros,substation
+06CALATRAVA,123.4606946,10.55356153,230,Visayas,"Calatrava substation, Negros Occidental",Negros,substation
+06GAHIT,122.9672809,10.88474544,230,Visayas,"Gahit substation, Negros Occidental",Negros,substation
+06HELIOS,123.2985792,10.92420288,230,Visayas,"Helios solar farm substation, Negros Occidental",Negros,generator
+06KABANKALAN,122.848185,10.0192417,138,Visayas,"Kabankalan substation, Negros Occidental",Negros,substation
+06KBANBESS,122.8516924,10.01997881,138,Visayas,"Kabankalan BESS substation, Negros Occidental",Negros,bess
+06MABINAY,122.9255255,9.729626783,138,Visayas,"Mabinay substation, Negros Oriental",Negros,substation
+06PGPP1,123.1774662,9.296893436,138,Visayas,"Palinpinon geothermal plant substation unit 1, Negros Oriental",Negros,generator
+06PGPP2,123.1568919,9.280816763,138,Visayas,"Palinpinon geothermal plant substation unit 2, Negros Oriental",Negros,generator
+06SNCARLOS,123.4335661,10.51580461,138,Visayas,"San Carlos substation, Negros Occidental",Negros,substation
+07CORELLA,123.9593251,9.699520408,138,Visayas,"Corella substation, Bohol",Bohol,substation
+07TAPAL,124.5195759,10.06090051,138,Visayas,"Tapal substation, Bohol",Bohol,substation
+07UBAY,124.5114284,10.02667044,138,Visayas,"Ubay substation, Bohol",Bohol,substation
+08BANTAP,122.5828264,10.72873409,69,Visayas,"Bantap substation, Iloilo",Panay,substation
+08BAROTAC,122.870264,11.03283455,138,Visayas,"Barotac substation, Iloilo",Panay,substation
+08BVISTA,122.6592157,10.71758251,138,Visayas,"Buena Vista substation, Guimaras",Guimaras,substation
+08CONCEPCION,123.121373,11.18913152,138,Visayas,"Concepcion substation, Iloilo",Panay,substation
+08DINGLE,122.6308302,11.02453374,138,Visayas,"Dingle substation, Iloilo",Panay,substation
+08ILOILO1,122.5924279,10.71585001,138,Visayas,"Iloilo 1 main substation, Iloilo City",Panay,substation
+08NABAS,122.0954808,11.81440808,138,Visayas,"Nabas wind farm substation, Aklan",Panay,generator
+08PANITAN,122.7926197,11.49401092,138,Visayas,"Panitan substation, Capiz",Panay,substation
+08SNJOSE,122.5362605,10.99817987,138,Visayas,"San Jose substation, Iloilo",Panay,substation
+08STBARBRA,122.5588103,10.83480342,138,Visayas,"Santa Barbara substation, Iloilo",Panay,substation

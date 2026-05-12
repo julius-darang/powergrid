@@ -1,0 +1,17 @@
+psgc_code,province,island_name,transmission_km,distribution_km,unknown_km,substation_count,transmission_score,distribution_score,submarine_present,phase1c_class,notes
+0878000000,Biliran,Biliran,0.0,0.0,0.0,1,1,0,False,osm_empty,
+0712000000,Bohol,Bohol,380.2,0.0,0.4,9,3,0,True,osm_empty,submarine_cable
+0722000000,Cebu,Cebu,1789.3,0.0,27.2,43,3,0,True,osm_empty,submarine_cable
+0679000000,Guimaras,Guimaras,0.0,0.0,0.0,0,0,0,False,osm_empty,
+0837000000,Leyte,Leyte,1889.7,0.1,72.6,19,3,1,True,osm_partial,submarine_cable
+0864000000,Southern Leyte,Leyte,83.9,0.1,0.6,3,2,1,True,osm_partial,submarine_cable
+0645000000,Negros Occidental,Negros,386.9,0.0,0.1,12,3,0,True,osm_empty,submarine_cable
+0746000000,Negros Oriental,Negros,142.8,0.0,16.3,9,2,0,True,osm_empty,submarine_cable
+0604000000,Aklan,Panay,0.0,0.0,0.0,0,0,0,False,osm_empty,
+0606000000,Antique,Panay,0.0,0.0,0.0,0,0,0,False,osm_empty,
+0619000000,Capiz,Panay,0.0,0.0,0.0,0,0,0,False,osm_empty,
+0630000000,Iloilo,Panay,42.2,0.0,0.0,1,1,0,False,osm_empty,
+0826000000,Eastern Samar,Samar,0.0,0.0,166.3,2,1,0,True,osm_empty,untagged_voltage_km=166; submarine_cable
+0848000000,Northern Samar,Samar,272.2,0.0,7.7,3,3,1,True,osm_partial,submarine_cable
+0860000000,Samar,Samar,1275.6,0.0,229.8,8,3,1,False,osm_partial,
+0761000000,Siquijor,Siquijor,0.0,0.0,0.0,1,1,0,False,osm_empty,

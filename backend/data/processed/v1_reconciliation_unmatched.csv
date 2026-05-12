@@ -1,0 +1,27 @@
+v1_name,v1_description,v1_island,v1_voltage_kv,v1_bus_type
+07CORELLA,"Corella substation, Bohol",Bohol,138,substation
+07TAPAL,"Tapal substation, Bohol",Bohol,138,substation
+05CEBU,"Cebu main substation, Cebu City",Cebu,138,substation
+05DAANBNTAY,"Daan Bantayan substation, Cebu",Cebu,230,substation
+05DAANLUNSOD,"Daan Lungsod substation, Cebu",Cebu,230,substation
+05NAGA,"Naga substation, Cebu",Cebu,138,substation
+05THERMA,"Therma Visayas power plant substation, Cebu",Cebu,138,generator
+04KANANGA,"Kananga substation, Leyte",Leyte,230,substation
+04TONGONA,"Tongonan geothermal plant substation, Leyte",Leyte,138,generator
+06BACOLOD,"Bacolod substation, Bacolod City, Negros Occidental",Negros,230,substation
+06GAHIT,"Gahit substation, Negros Occidental",Negros,230,substation
+06KABANKALAN,"Kabankalan substation, Negros Occidental",Negros,138,substation
+06KBANBESS,"Kabankalan BESS substation, Negros Occidental",Negros,138,bess
+06MABINAY,"Mabinay substation, Negros Oriental",Negros,138,substation
+06PGPP1,"Palinpinon geothermal plant substation unit 1, Negros Oriental",Negros,138,generator
+06PGPP2,"Palinpinon geothermal plant substation unit 2, Negros Oriental",Negros,138,generator
+08BANTAP,"Bantap substation, Iloilo",Panay,69,substation
+08BAROTAC,"Barotac substation, Iloilo",Panay,138,substation
+08BVISTA,"Buena Vista substation, Iloilo",Panay,138,substation
+08DINGLE,"Dingle substation, Iloilo",Panay,138,substation
+08ILOILO1,"Iloilo 1 main substation, Iloilo City",Panay,138,substation
+08NABAS,"Nabas wind farm substation, Aklan",Panay,138,generator
+08PANITAN,"Panitan substation, Capiz",Panay,138,substation
+08SNJOSE,"San Jose substation, Iloilo",Panay,138,substation
+08STBARBRA,"Santa Barbara substation, Iloilo",Panay,138,substation
+04BABATNGN,"Babatngon substation, Northern Leyte",Samar,138,substation

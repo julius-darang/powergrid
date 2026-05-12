@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pandapower
+osmnx
+geopandas
+shapely
+pandas
+contextily
+matplotlib
+reportlab
+psycopg2-binary
+sqlalchemy
+networkx
+asyncpg
+jupyter

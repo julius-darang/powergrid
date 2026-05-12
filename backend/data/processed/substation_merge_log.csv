@@ -1,0 +1,5 @@
+dropped_bus_id,kept_bus_id,dropped_name,kept_name,province,reason
+v1_05daanlunsod,v1_05daanbntay,"Daan Lungsod substation, Cebu","Daan Bantayan substation, Cebu",Cebu,co-located within 0.5 km
+v1_06kbanbess,v1_06kabankalan,"Kabankalan BESS substation, Negros Occidental","Kabankalan substation, Negros Occidental",Negros Occidental,co-located within 0.5 km
+sub_synth_capiz,"(none - dropped, province now has v1 substation)",Synthetic root — Capiz,,Capiz,redundant_virtual_root
+sub_synth_guimaras,"(none - dropped, province now has v1 substation)",Synthetic root — Guimaras,,Guimaras,redundant_virtual_root

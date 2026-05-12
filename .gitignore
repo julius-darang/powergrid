@@ -1,0 +1,37 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- macOS / editors ---
+.DS_Store
+.vscode/
+.idea/
+
+# --- Data caches & large binaries ---
+# osmnx HTTP response cache; safe to delete, will re-download on next run
+cache/
+
+# v0 boundary attempt, deleted during cleanup (superseded by GADM in
+# backend/data/boundaries/). Defensive entries in case anyone re-downloads.
+data/PH_Adm2_ProvDists.shp/
+data/PH_Adm2_ProvDists.shp.zip
+
+# GADM geopackage (72 MB) — re-downloadable from geodata.ucdavis.edu;
+# notebook 00 fetches it on first run if missing.
+backend/data/boundaries/gadm41_PHL.gpkg
+
+# --- Generated outputs ---
+# Notebook figure dumps — regenerate from notebooks on demand.
+outputs/
+
+# --- Docker / Postgres data dir (if mounted locally) ---
+postgres_data/
