@@ -13,9 +13,11 @@ Visayas (Cebu + Negros + Leyte + Bohol + Samar, 1 230 buses in the
 big connected component) and three-scenario load-flow results.
 Newton–Raphson converges at off-peak (×0.40, 330 MW); morning and
 evening peak load fall back to DC. The pipeline runs end-to-end in
-~23 s via `python scripts/run_phase2.py`. The PostGIS loader (2A.1)
-is intentionally not part of this chain — no container runtime was
-available; it picks up cleanly once Docker / OrbStack is installed.
+~23 s via `python scripts/run_phase2.py`. All deliverables also live
+in PostGIS — `scripts/load_to_postgis.py` round-trips the CSVs into
+the `buses` / `lines` / `load_flow_results` tables (under 1 s) and
+benchmarks the six API access patterns from the v2 plan §3.2; the
+slowest came in at 29.7 ms median, well inside the 100 ms rubric.
 
 ## What lives where
 
@@ -34,6 +36,7 @@ available; it picks up cleanly once Docker / OrbStack is installed.
 | `notebooks/13_pandapower_build.ipynb` | Network build: buses, lines/transformers split, loads, gens, slack |
 | `notebooks/14_loadflow.ipynb` | Three-scenario load flow (NR + DC fallback) |
 | `notebooks/15_loadflow_audit.ipynb` | Per-province voltage/loading audit |
+| `scripts/load_to_postgis.py` | 2A loader + GIST benchmark — idempotent CSV→DB round-trip |
 
 ## Headline numbers
 
@@ -101,10 +104,6 @@ available; it picks up cleanly once Docker / OrbStack is installed.
 
 ### Process
 
-- **PostGIS loader (2A.1) and GIST query verification (2A.2)
-  deferred.** No container runtime available; needs Docker /
-  OrbStack install. Pure mechanical work once a runtime exists —
-  schema is live in `init.sql`, target row counts known.
 - **Empty scaffolding still empty.** `backend/services/`,
   `backend/routers/`, `backend/models/`, `frontend/src/components/`,
   `frontend/src/hooks/`. No FastAPI, no React.
@@ -116,24 +115,27 @@ available; it picks up cleanly once Docker / OrbStack is installed.
   `bus_type='substation'` at 350 kV. No code change — closeout
   carries the correction so future readers don't go looking for a
   field that doesn't exist.
+- **Phase 1 closeout's deferred PostGIS loader.** OrbStack
+  installed; container runs; `scripts/load_to_postgis.py` round-
+  trips all three CSVs and benchmarks the six API access patterns.
+  The single slowest query (`province_filter_lines_via_buses` —
+  `lines JOIN buses` with `OR` on `from_bus`/`to_bus`) is
+  29.7 ms median, 29.7 ms max. The KNN nearest-bus query is sub-
+  millisecond. `init.sql` now also includes the `convergence_mode`
+  column on `load_flow_results` (Phase 2 added it inline; now it's
+  in the canonical schema for future container starts).
 
 ## Where Phase 3 picks up
 
-Two candidate next moves, mutually compatible:
+PostGIS is live and seeded. The natural next move is the FastAPI
+backend per `power-grid-viz-plan-v2.md` §4 — endpoints
+`/api/grid/transmission`, `/api/loadflow/{scenario}`,
+`/api/provinces`. The empty `backend/services/` and
+`backend/routers/` directories are waiting. The six benchmarked
+queries already cover the four most common access patterns
+(viewport, province filter, KNN), so each endpoint is one
+SQL-template-and-marshal step from working.
 
-1. **PostGIS loader** (~1 day, was 2A.1). Install Docker /
-   OrbStack, run `docker compose up -d db`, write
-   `scripts/load_to_postgis.py` to push `buses.csv`, `lines.csv`,
-   and `load_flow_results.csv` into the schema. Confirm < 100 ms
-   GIST queries. This is mechanical now that the deliverables exist.
-2. **Phase 3 FastAPI backend** (per `power-grid-viz-plan-v2.md`
-   §4). Endpoints `/api/grid/transmission`,
-   `/api/loadflow/{scenario}`, `/api/provinces`. The empty
-   `backend/services/` and `backend/routers/` directories are
-   waiting. Reads either from the CSVs directly (fast to ship) or
-   from PostGIS (correct long-term).
-
-The cleanest sequence is PostGIS first (1) then API (2) — but if the
-goal is a runnable end-to-end demo before installing Docker, the API
-can read CSVs directly. Picking up either does not invalidate the
-other.
+A parallel calibration thread is also worth flagging: the
+Phase 1 synthetic-feeder impedance issue (the convergence cliff)
+is independent of API work and could be done in either order.

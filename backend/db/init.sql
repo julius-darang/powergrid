@@ -43,7 +43,8 @@ CREATE TABLE load_flow_results (
     va_degree FLOAT,
     loading_percent FLOAT,
     p_from_mw FLOAT,
-    p_to_mw FLOAT
+    p_to_mw FLOAT,
+    convergence_mode TEXT  -- 'nr' | 'dc' — Phase 2 added; DC fallback when NR diverges
 );
 
 -- Spatial indexes (critical for query performance)

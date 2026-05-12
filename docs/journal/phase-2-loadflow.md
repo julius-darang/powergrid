@@ -472,3 +472,116 @@ and FastAPI as the two candidate next moves. Both are
 mutually compatible; the cleanest sequence is PostGIS first
 because the deliverables are mechanical to load now that
 schema and CSV layout agree.
+
+---
+
+## Day 26 — Container runtime + PostGIS loader (2A.1 / 2A.2)
+
+The Phase 2 closeout deferred 2A because no container runtime was
+installed. Day 26 fills that gap and runs both items end to end.
+
+### Installing OrbStack
+
+`brew install --cask orbstack` finished in under a minute.
+OrbStack symlinks the `docker` and `docker-compose` CLIs into
+`/usr/local/bin/` once the app launches — the first
+`open -a OrbStack` did that automatically. `orbctl doctor`
+confirmed everything healthy. The container starts via the
+existing `docker-compose.yml` (one note: Docker emitted a
+deprecation warning about the obsolete `version: "3.9"` key —
+cosmetic, the file still works).
+
+```
+$ docker compose up -d db
+[+] Running 12/12 ✓
+$ docker compose ps
+NAME             STATUS                    PORTS
+powergrid-db-1   Up 49 seconds (healthy)   0.0.0.0:5432->5432/tcp
+```
+
+`init.sql` ran automatically via the `docker-entrypoint-initdb.d/`
+bind-mount: `buses`, `lines`, `load_flow_results` tables and the
+PostGIS 3.3.4 extension all in place after first start. One
+quirk: the `postgis/postgis:15-3.3` image is `linux/amd64` and
+runs under Rosetta on Apple Silicon. Works, just slower than a
+native arm64 build would be — the GIST benchmarks below still
+clear the 100 ms rubric easily.
+
+### `scripts/load_to_postgis.py` — the loader
+
+The script reads `buses.csv`, `lines.csv`, and
+`load_flow_results.csv` and inserts via `psycopg2.execute_values`
+in one transaction (`with conn:`). Idempotent — `TRUNCATE …
+CASCADE` runs first, so re-running drops any prior rows. Three
+geometry constructions matter:
+
+- **Bus geom** is built inline from `(lon, lat)` with
+  `ST_SetSRID(ST_MakePoint(%s, %s), 4326)`.
+- **Line geom** is a two-point LINESTRING from the from_bus and
+  to_bus coordinates. Built as WKT in Python
+  (`f'LINESTRING({fc.lon} {fc.lat}, {tc.lon} {tc.lat})'`) and
+  passed through `ST_GeomFromText(%s, 4326)`. A pre-built
+  `bus_coord` dataframe-indexed-by-bus_id makes the per-line
+  lookup O(1).
+- **`load_flow_results.convergence_mode`** wasn't in the
+  original schema. The script `ALTER TABLE … ADD COLUMN IF NOT
+  EXISTS` it at the top of the load, and `init.sql` was also
+  updated so future container starts have it natively.
+
+The load finishes in well under a second:
+
+```
+buses                 2952 rows  (0.13 s)
+lines                 2965 rows  (0.28 s)
+load_flow_results     7572 rows  (0.21 s)
+```
+
+`ANALYZE` runs at the end to refresh planner statistics — the
+GIST benchmarks immediately after depend on this.
+
+### 2A.2 — GIST query benchmark
+
+Six queries cover the API access patterns from
+`power-grid-viz-plan-v2.md` §3.2: viewport (what the map draws
+on every pan/zoom), province filter (sidebar "show only Cebu"),
+and KNN nearest-N (click-to-inspect). Each runs 5 times with a
+warm-up pass first; the script reports min / median / max and
+asserts every max under 100 ms.
+
+```
+query                                rows   min_ms   med_ms   max_ms  ok?
+viewport_buses_cebu                  1240     1.76     2.66     4.61  ✓
+viewport_lines_cebu                  1294     2.27     4.34    25.73  ✓
+viewport_buses_full_visayas          2866     2.41     2.50     4.28  ✓
+province_filter_buses                 977     0.87     0.94     1.02  ✓
+province_filter_lines_via_buses      1004    27.86    29.19    29.70  ✓
+knn_nearest_10_buses                   10     0.30     0.34     0.46  ✓
+```
+
+The slowest query, `province_filter_lines_via_buses`, is a
+join with `OR` across two FK columns
+(`l.from_bus = b.bus_id OR l.to_bus = b.bus_id`). PostgreSQL
+can't index the OR cleanly so it scans both directions and
+deduplicates — the same query rewritten with `UNION ALL` and
+distinct-keys would be faster, but at 30 ms it's well inside
+the rubric and Phase 3 can refactor if it ever matters.
+
+The KNN query (`ORDER BY geom <-> point LIMIT 10`) deserves a
+mention: it goes through the GIST index's KNN extension and
+clears 10 rows in under half a millisecond. Click-to-inspect
+will feel instant.
+
+### What changed and what's next
+
+- `scripts/load_to_postgis.py` added (~190 lines, idempotent,
+  loader + benchmark in one file).
+- `backend/db/init.sql` updated: `convergence_mode TEXT` added
+  to `load_flow_results`.
+- Phase 2 closeout updated: 2A.1 and 2A.2 moved from "deferred"
+  to "resolved during Phase 2"; "Where Phase 3 picks up" now
+  recommends the FastAPI work directly since PostGIS is seeded.
+
+Phase 2 is now genuinely complete. The remaining open thread
+worth a return visit is the synthetic-feeder impedance issue
+(the NR convergence cliff at ~0.66 of full load) — but that
+sits parallel to Phase 3, not in front of it.

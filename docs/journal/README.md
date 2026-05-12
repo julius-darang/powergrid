@@ -35,7 +35,10 @@ Phase 2 produced `load_flow_results.csv` (7 572 rows, three
 scenarios — off-peak NR-converged, morning / evening on DC
 fallback) on the 1 230-bus mainland Visayas component out of
 2 952 total. Pipeline runs end-to-end in ~23 s via
-`python scripts/run_phase2.py`. See
+`python scripts/run_phase2.py`. PostGIS is live and seeded
+(`scripts/load_to_postgis.py`); the six benchmarked GIST
+queries from `power-grid-viz-plan-v2.md` §3.2 all clear the
+100 ms rubric (slowest 29.7 ms). See
 [phase-2-closeout.md](../closeouts/phase-2-closeout.md) for
 the convergence cliff and the 522 MW of fragment load still
 unmodelled.
