@@ -590,94 +590,334 @@ sits parallel to Phase 3, not in front of it.
 
 ## Day 27 — Phase 1 feeder-impedance recalibration
 
-The convergence cliff was the headline open thread; revisiting
-it produced the biggest single quality improvement in the
-project so far. NR now converges at *all three* scenarios with
-no DC fallback.
+The convergence cliff was the headline open thread from the
+Phase 2 closeout. Revisiting it produced the biggest single
+quality improvement in the project so far: NR now converges at
+*all three* scenarios with no DC fallback. This entry walks
+through why the original impedance values were wrong, how the
+fix was picked, what shifted in the pipeline outputs, and what
+the new numbers say about the underlying physical model.
+
+### Why we're back here
+
+Phase 2's Day 24 bisect put the NR convergence cliff at
+`load_scale ≈ 0.66` — anywhere above ~545 MW of in-service
+load and the Jacobian became singular before NR could converge.
+At the cliff the worst bus voltage was 0.457 pu, well into
+voltage-collapse territory. The Phase 2 closeout's "Convergence
+and modelling" thread listed two fixes:
+
+- (a) **Recalibrate distribution impedance downward** —
+  identified as "likely correct because these are
+  overhead-conductor values misapplied to short radial
+  feeders."
+- (b) **Accept DC-only results for morning/evening peak.**
+
+We shipped (b) on Day 24. Day 27 finally does (a) — about
+half a day's work, mostly waiting for `run_phase1.py` and
+`run_phase2.py` to re-run.
+
+### Diagnosis: why 0.40/0.40 was wrong
+
+The synthetic feeder values that Phase 1C wrote into every
+13.8 kV distribution line:
+
+```
+DIST_R_OHM_PER_KM = 0.40    # series resistance
+DIST_X_OHM_PER_KM = 0.40    # series reactance
+DIST_MAX_I_KA     = 0.30    # thermal rating
+```
+
+These look reasonable in isolation — they're plausible for
+*overhead ACSR conductor*. The problem is what they imply at
+13.8 kV under realistic load:
+
+```
+Base impedance Z_base = V² / S_base
+                     = 13.8² / 1 MVA   = 190 Ω
+
+Per-unit impedance per km:
+   r_pu/km = 0.40 / 190 ≈ 0.0021
+   x_pu/km = 0.40 / 190 ≈ 0.0021
+```
+
+A 5 km feeder carrying 5 MW (call it `S = 0.005 pu`) sees a
+voltage drop of approximately `S × Z = 0.005 × (0.0021 × 5) ≈
+0.00005 pu` per segment — that *looks* fine. But Phase 1C's
+synthetic radials are *fans*: a substation feeds 4–6 feeders,
+each feeder has 5–8 buses in a chain, and the bus closest to
+the substation carries the cumulative load of everything
+downstream. At evening peak the first segment of a Negros
+Occidental feeder carries the full 5–10 MW of its branch with
+voltages already low (because Cebu/Negros are submarine-fed
+through cascading transformers from Ormoc). Voltage drops
+compound geometrically; the worst bus ends up at 0.46 pu.
+
+The right physical analogy is *short underground XLPE cable
+inside a metropolitan distribution loop*, not overhead spans
+across rural Negros. Typical XLPE values for 13.8 kV:
+
+| Conductor | r (Ω/km) | x (Ω/km) |
+|---|---:|---:|
+| ACSR overhead | 0.30–0.45 | 0.35–0.40 |
+| Aluminium XLPE underground | 0.08–0.12 | 0.10–0.15 |
+
+The synthetic Phase 1C feeders are short hops between
+adjacent distribution-bus stubs — closer to the XLPE end of
+the spectrum than to long overhead spans. So:
+
+```
+DIST_R_OHM_PER_KM:  0.40  →  0.10   (4× lower)
+DIST_X_OHM_PER_KM:  0.40  →  0.15   (~2.7× lower)
+```
+
+`DIST_MAX_I_KA = 0.30` stays. `max_i_ka` only feeds
+`loading_percent` reporting, not the load-flow convergence —
+it's a thermal rating, not an electrical parameter, and the
+NR Jacobian doesn't see it. The Therma-spur overload (see
+below) is a separate `max_i_ka` issue that Day 27 deliberately
+does *not* try to fix.
 
 ### The change
 
-Three Phase 1C notebooks (`03_synthetic_distribution.ipynb`,
-`09_iloilo_redistribution.ipynb`,
-`10_redistribute_provinces.ipynb`) each define
-`DIST_R_OHM_PER_KM = 0.40` and `DIST_X_OHM_PER_KM = 0.40` —
-overhead-conductor values misapplied to short synthetic radial
-feeders. A single `sed` pass per notebook:
+Three Phase 1C notebooks define the constants:
+
+- `notebooks/03_synthetic_distribution.ipynb` — initial fan-out
+  for all `osm_empty` provinces (Phase 1C Day 11).
+- `notebooks/09_iloilo_redistribution.ipynb` — Day 17 Iloilo re-run
+  using a higher feeder count.
+- `notebooks/10_redistribute_provinces.ipynb` — Day 18 parametrised
+  re-run for the eight sparse provinces.
+
+All three define the constants the same way (single source of
+truth would have been nicer; existing structure is what we
+have). A single `sed` in-place per notebook:
+
+```bash
+sed -i '' \
+  's/DIST_R_OHM_PER_KM = 0.40/DIST_R_OHM_PER_KM = 0.10/g; \
+   s/DIST_X_OHM_PER_KM = 0.40/DIST_X_OHM_PER_KM = 0.15/g' \
+  notebooks/{03,09,10}_*.ipynb
+```
+
+A post-edit grep confirms zero occurrences of `0.40` remain
+and exactly one of `0.10` / `0.15` per file. Each notebook also
+*reads* `DIST_R_OHM_PER_KM` later (e.g.
+`'r_ohm_per_km': DIST_R_OHM_PER_KM` in the line-construction
+dict) — those references pick up the new values automatically.
+
+### Re-running Phase 1
 
 ```
-DIST_R_OHM_PER_KM = 0.40  →  0.10
-DIST_X_OHM_PER_KM = 0.40  →  0.15
-```
+$ .venv/bin/python scripts/run_phase1.py
+Phase 1 orchestrator — 11 notebooks queued
+  ▶ run    02_transmission_cleaning.ipynb   ( Phase 1B: OSM transmission )
+  …
+  ▶ run    03_synthetic_distribution.ipynb  ( Phase 1C: initial synthetic distribution )
+  ▶ run    04_name_reconciliation.ipynb     ( Step 1: match v1 names onto OSM buses )
+  ▶ run    06_v1_substation_import.ipynb    ( Step 2: import unmatched v1 substations )
+  ▶ run    07_v1_line_synthesis.ipynb       ( Step 3: Panay MST + non-Panay spurs )
+  ▶ run    08_kabankalan_handconnect.ipynb  ( Step 3b: hand-coded Kabankalan ↔ Mabinay )
+  ▶ run    11_substation_merge.ipynb        ( Substation merge + redundant-virtual cleanup )
+  ▶ run    13_voltage_inheritance.ipynb     ( Day 21: voltage inheritance for untagged OSM lines )
+  ▶ run    09_iloilo_redistribution.ipynb   ( Day 17: Iloilo distribution re-run )
+  ▶ run    10_redistribute_provinces.ipynb  ( Day 18: parametrised re-run for 8 provinces )
+  ▶ run    12_load_assignment.ipynb         ( Day 20: population-weighted load assignment )
+  [   3s]  2959 buses (osm=186, synthetic=2749, v1_curated=24) /  2972 lines
 
-These are sensible underground-XLPE-cable-ish values for 13.8 kV
-distribution. `DIST_MAX_I_KA = 0.30` stays — that's a reporting
-parameter for `loading_percent`, not a convergence parameter.
-
-### Pipeline re-run
-
-```
-$ python scripts/run_phase1.py
 ✓ pipeline complete in 39s
-✓ verified: 2959 buses, 2972 lines, dist load 2282 MW vs target
-2282 MW (drift 0.00%)
+  [final]  2959 buses (osm=186, synthetic=2749, v1_curated=24) /  2972 lines
+  ✓ verified: 2959 buses, 2972 lines, dist load 2282 MW vs target 2282 MW (drift 0.00%)
 ```
 
-Row counts shifted slightly (2952→2959 buses, 2965→2972 lines)
-because the substation-merge step in Phase 1 picks a slightly
-different consolidation when the synthetic feeders have
-different impedance — a known effect; load total is unchanged
-within the orchestrator's ±5 % tolerance.
+Row counts shifted slightly: **2 952 → 2 959 buses** and
+**2 965 → 2 972 lines**. The shift is real but small — about
+0.2 %. Where does it come from?
+
+The Phase 1 pipeline has a substation-merge step
+(`notebooks/11_substation_merge.ipynb`) that consolidates
+substations within 500 m of each other. When the synthetic
+feeders that hang off those substations have different
+electrical parameters, the merge step's tie-breakers shift —
+specifically, the canonical bus chosen for a merge cluster can
+flip when its downstream feeders have different impedance
+profiles, and that cascades into different `from_bus`/`to_bus`
+references on a handful of lines. Total is unchanged within
+the orchestrator's `±5 %` tolerance and the load total holds
+at 2 282 MW vs target 2 282 MW (drift 0.00 %). The acceptance
+gate at the bottom of `run_phase1.py` would have caught any
+real regression.
+
+### Re-running Phase 2
 
 ```
-$ python scripts/run_phase2.py
+$ .venv/bin/python scripts/run_phase2.py
+Phase 2 orchestrator — 4 notebooks queued
+  ▶ run    12_topology_audit.ipynb       (2A.3: NetworkX connected components)
+  ▶ run    13_pandapower_build.ipynb     (2B:   network + transformers + gens + slack)
+  ▶ run    14_loadflow.ipynb             (2C:   three-scenario load flow (NR + DC fallback))
+  ▶ run    15_loadflow_audit.ipynb       (2D:   per-province voltage and loading audit)
+
 ✓ pipeline complete in 23s
-✓ verified: 66 components, 7536 result rows, 3 scenarios
+  ✓ verified: 66 components, 7536 result rows, 3 scenarios
 ```
 
-Topology audit unchanged at 66 components — recalibration
-doesn't connect new submarine cables, so the disconnected
-fragments are still disconnected. The 1 230-bus big component
-still carries 826 MW of in-service load.
+The topology audit reports **66 components, unchanged**. That's
+the right answer — recalibrating impedance can't connect
+submarine cables that aren't in the data. The disconnected
+Panay / Cebu fragments / Antique / Biliran / Siquijor are still
+disconnected. The 1 230-bus big component still carries 826 MW
+of in-service load.
+
+Row count drops to 7 536 (from 7 572 pre-recalibration), driven
+by the slight in-service edge count shift from the Phase 1
+re-run. Math:
+
+```
+Per-scenario rows = in-service buses + in-service edges
+                  = 1 230 + 1 282 = 2 512 (was 2 524)
+3 scenarios       = 7 536 total
+```
+
+The 12-edge reduction is from the same Phase 1 substation-merge
+shift — a couple of lines that previously had both endpoints in
+service now have one endpoint that ended up in a different
+fragment.
 
 ### The new load-flow numbers
 
-| Scenario | Factor | Mode (before) | Mode (after) | `vm_pu_min` (before) | `vm_pu_min` (after) |
+| Scenario | Factor | Mode (Day 24) | Mode (Day 27) | `vm_pu_min` (Day 24) | `vm_pu_min` (Day 27) |
 |---|---:|---|---|---:|---:|
 | off_peak | 0.40 | nr | nr | 0.766 | **0.903** |
-| morning_peak | 0.85 | dc | **nr** | — | 0.779 |
-| evening_peak | 0.95 | dc | **nr** | — | 0.743 |
+| morning_peak | 0.85 | **dc** | **nr** | — | 0.779 |
+| evening_peak | 0.95 | **dc** | **nr** | — | 0.743 |
 
-Per-province voltage minima at evening peak (the worst case):
+All three scenarios now NR-converge. Slack imports:
 
-| Province | `vm_pu_min` | `n_under_0.95 / total` |
-|---|---:|---|
-| Negros Occidental | 0.743 | 190 / 190 (100 %) |
-| Cebu | 0.847 | 327 / 411 (80 %) |
-| Bohol | 0.852 | 154 / 182 (85 %) |
-| Negros Oriental | 0.893 | 46 / 118 (39 %) |
-| Eastern Samar | 0.895 | 17 / 25 (68 %) |
-| Samar | 0.928 | 11 / 46 (24 %) |
-| Leyte | 0.934 | 15 / 194 (8 %) |
-| Northern Samar | 0.953 | 0 / 20 |
-| Southern Leyte | 0.962 | 0 / 38 |
+| Scenario | Load (MW) | Gen (MW) | Slack p (MW) |
+|---|---:|---:|---:|
+| off_peak | 328 | 600 | −243 (export to Luzon) |
+| morning_peak | 697 | 600 | +134 (import from Luzon) |
+| evening_peak | 779 | 600 | +223 (import from Luzon) |
 
-Under-voltage at peak is now a real engineering signal: every
-NegOcc bus is below 0.95 because there's no local generation
-in NegOcc (Palinpinon ×2 is in NegOr, Therma is in Cebu).
-That's a Phase 3 calibration thread, not a numerical artifact.
+The off-peak export number is realistic — Visayas does export
+to Luzon when local demand is below local generation. Morning
+and evening import numbers (134 / 223 MW) line up roughly with
+real NGCP HVDC transfer data; not validated against published
+numbers, but plausibly in the right neighborhood.
+
+### Per-province voltage health (evening peak — worst case)
+
+| Province | bus_count | `vm_pu_min` | `vm_pu_mean` | `n_under_0.95` | % under |
+|---|---:|---:|---:|---:|---:|
+| Negros Occidental | 190 | 0.743 | 0.854 | 190 | 100 % |
+| Cebu | 411 | 0.847 | 0.924 | 327 | 80 % |
+| Bohol | 182 | 0.852 | 0.928 | 154 | 85 % |
+| Negros Oriental | 118 | 0.893 | 0.959 | 46 | 39 % |
+| Eastern Samar | 25 | 0.895 | 0.941 | 17 | 68 % |
+| Samar | 46 | 0.928 | 0.965 | 11 | 24 % |
+| Leyte | 194 | 0.934 | 0.987 | 15 | 8 % |
+| Northern Samar | 20 | 0.953 | 0.993 | 0 | 0 % |
+| Southern Leyte | 38 | 0.962 | 0.994 | 0 | 0 % |
+
+The picture maps neatly onto the **generation siting**:
+
+- **Negros Occidental — 100 % under 0.95.** No local generator
+  in NegOcc. Palinpinon 1+2 (100+80 MW) is in NegOr; power
+  has to traverse the Negros submarine link from Cebu and the
+  internal Negros 230 kV backbone. The voltages collapsing
+  here aren't a model artifact — they reflect a real lack of
+  generation in the busiest demand province of Negros.
+- **Cebu / Bohol — 80–85 % under 0.95.** Cebu has Therma (300
+  MW) but ~720 MW of demand (the audit shows 411 buses ×
+  ~1.7 MW average). Bohol is submarine-fed entirely. The
+  Cebu undervoltage is more nuanced — Therma sits at one
+  bus, so power flows radially outward and voltages drop with
+  distance from the plant.
+- **Leyte / Samar / NorSamar / SLeyte — mostly fine.**
+  Tongonan (120 MW) lives in Leyte and dispatches into a low-
+  population eastern Visayas. These provinces have light load
+  per bus and short electrical distance to local generation.
+
+This is exactly the kind of result the v2 plan wanted Phase 2
+to produce: not "everything is at 1.0 pu" (which would be
+suspicious), and not "everything is at 0.5 pu" (which would be
+broken), but a *physical* picture where voltages drop in the
+provinces that lack local injection. Phase 3's calibration
+threads now have specific targets — add more generators to
+Negros (Mindanao-Visayas interconnect at La Carlota? Sual
+geothermal?), boost Therma's `p_mw`, add CEDC.
 
 ### Downstream effects
 
-- `load_flow_results.csv` now has `convergence_mode = 'nr'` for
-  all 7 536 rows — the DC fallback path is unused.
-- The Phase 2 closeout's "convergence cliff at ~0.66" open
-  thread is **resolved**.
-- `scripts/load_to_postgis.py` re-run loads the new CSVs in
-  ~0.6 s; all six GIST benchmarks still under 100 ms (slowest
-  26 ms).
-- One persistent line overload remains: `line_synth_spur_006`
-  Therma → `sub_osm_83` at ~180–195 % loading across all
-  scenarios. That's a `max_i_ka` undersizing on the generator
-  export spur (300 MW Therma dispatch into a line rated for
-  ~167 MVA). Independent of feeder impedance; a separate Phase
-  1 calibration concern.
+- **`load_flow_results.csv`** now has `convergence_mode = 'nr'`
+  for all 7 536 rows. The DC fallback path is unused but
+  remains in `14_loadflow.ipynb` as a safety net.
+- **The Phase 2 closeout's "convergence cliff at ~0.66" open
+  thread** is marked **RESOLVED** with a back-reference to this
+  Day 27 entry.
+- **`scripts/load_to_postgis.py`** re-run loads the new CSVs
+  in ~0.6 s (idempotent `TRUNCATE … CASCADE`). All six GIST
+  benchmarks still under 100 ms:
+
+  ```
+  query                                rows   min_ms   med_ms   max_ms  ok?
+  viewport_buses_cebu                  1244     1.48     1.54     1.58  ✓
+  viewport_lines_cebu                  1300     1.60     1.71     1.98  ✓
+  viewport_buses_full_visayas          2873     2.26     2.36     2.48  ✓
+  province_filter_buses                 979     0.85     0.86     0.91  ✓
+  province_filter_lines_via_buses      1006    25.67    26.02    26.24  ✓
+  knn_nearest_10_buses                   10     0.28     0.29     0.39  ✓
+  ```
+- **`pp_network.json`** regenerated; transformer count
+  effectively unchanged (547 → 547 — same set of cross-voltage
+  edges); generator dispatch (Therma 300, Tongonan 120,
+  Palinpinon 1 100, Palinpinon 2 80) unchanged.
+- **Phase 3 FastAPI scaffold (built in parallel — see
+  `docs/journal/phase-3-api.md` Day 27)** picked up the new
+  CSV counts through PostGIS without code changes. Two pytest
+  sanity tests updated to assert 2 959 / 2 972 / 7 536; both
+  pass.
+
+### What's still open
+
+- **`line_synth_spur_006` Therma → `sub_osm_83`** reports
+  ~180–195 % loading across all scenarios. Loading_percent of
+  a line is `I / max_i_ka`. The line is rated `max_i_ka = 0.7`
+  on a 138 kV side, giving roughly 167 MVA. Therma dispatches
+  300 MW into that single spur. Fix is to bump `max_i_ka` on
+  the generator export spur to ~1.5 (matching a 400 MVA bundled
+  conductor) or split the dispatch across multiple spurs. This
+  is a Phase 1 calibration concern independent of feeder
+  impedance.
+- **Negros Occidental's 100 % undervoltage** is now real and
+  visible. Adding more generators (or boosting Therma to 600+
+  MW for Cebu's local load and importing more via submarine
+  to NegOcc) is the next obvious thread. The right way to do
+  it is Phase 1 data calibration; for now it's a known
+  modelling limitation.
+- **The 522 MW of fragment load** (Panay / Aklan / Antique /
+  Capiz / Iloilo / Biliran / Siquijor / Guimaras) still sits
+  outside the load flow because their host components are
+  disconnected. Recalibration didn't help here — needs real
+  topology work.
+
+### What the change cost
+
+About 30 minutes of human + machine time:
+
+- ~1 minute to read the Phase 2 closeout's open-threads section
+  and pick the cheapest unblocked thread.
+- ~5 minutes to grep for the constants and identify the three
+  notebooks that own them.
+- ~1 minute for the `sed` edit + verification grep.
+- ~40 seconds for `run_phase1.py`.
+- ~25 seconds for `run_phase2.py`.
+- ~15 minutes to read the new `loadflow_audit.csv` numbers,
+  build the per-province voltage health picture, and write this
+  journal entry.
+
+That ratio — minutes of work, fundamental quality improvement —
+is what the Phase 2 closeout's "open threads" enumeration is
+for. The thread had been calling out exactly where to look;
+Day 27 just finally followed the pointer.
