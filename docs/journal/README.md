@@ -23,25 +23,25 @@ docs/
 
 | Phase | Journal                                        | Closeout                                            | Status      |
 | ----- | ---------------------------------------------- | --------------------------------------------------- | ----------- |
-| 1     | [phase-1-data.md](phase-1-data.md)             | [phase-1-closeout.md](../closeouts/phase-1-closeout.md) | **done**    |
+| 1     | [phase-1-data.md](phase-1-data.md)             | [phase-1-closeout.md](../closeouts/phase-1-closeout.md) | **done** (Day 27 recal) |
 | 2     | [phase-2-loadflow.md](phase-2-loadflow.md)     | [phase-2-closeout.md](../closeouts/phase-2-closeout.md) | **done**    |
-| 3     | API                                            | —                                                   | not started |
+| 3     | [phase-3-api.md](phase-3-api.md)               | —                                                   | scaffolded  |
 | 4     | Frontend                                       | —                                                   | not started |
 | 5     | Polish                                         | —                                                   | not started |
 
 ## Current state in one line
 
-Phase 2 produced `load_flow_results.csv` (7 572 rows, three
-scenarios — off-peak NR-converged, morning / evening on DC
-fallback) on the 1 230-bus mainland Visayas component out of
-2 952 total. Pipeline runs end-to-end in ~23 s via
-`python scripts/run_phase2.py`. PostGIS is live and seeded
-(`scripts/load_to_postgis.py`); the six benchmarked GIST
-queries from `power-grid-viz-plan-v2.md` §3.2 all clear the
-100 ms rubric (slowest 29.7 ms). See
-[phase-2-closeout.md](../closeouts/phase-2-closeout.md) for
-the convergence cliff and the 522 MW of fragment load still
-unmodelled.
+After the Day 27 Phase 1 feeder-impedance recalibration
+(`DIST_R/X` 0.40 → 0.10/0.15), NR converges for all three
+scenarios with no DC fallback (off-peak `vm_pu_min` 0.903,
+evening-peak 0.743). Phase 3 FastAPI scaffold is live and
+verified — nine endpoints serving GeoJSON + load-flow JSON
+from PostGIS, two pytest sanity tests passing.
+`scripts/run_phase1.py` (~39 s) and `scripts/run_phase2.py`
+(~23 s) rebuild from raw OSM end-to-end. See
+[phase-2-loadflow.md](phase-2-loadflow.md) Day 27 for the
+recalibration story and [phase-3-api.md](phase-3-api.md) for
+the API scaffold.
 
 ## Conventions
 

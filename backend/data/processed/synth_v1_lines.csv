@@ -13,7 +13,7 @@ line_synth_spur_001,v1_07tapal,sub_ubay_substation_54,138.0,3.9332065745338776,0
 line_synth_spur_002,v1_05cebu,sub_osm_2,138.0,1.4891753933745562,0.08,0.4,0.7,False,overhead,True,synthetic_v1
 line_synth_spur_003,v1_05daanbntay,sub_medellin_load_end_substation_23,138.0,5.3279148063045065,0.08,0.4,0.7,False,overhead,True,synthetic_v1
 line_synth_spur_004,v1_05daanlunsod,sub_medellin_load_end_substation_23,138.0,5.3279148063045065,0.08,0.4,0.7,False,overhead,True,synthetic_v1
-line_synth_spur_005,v1_05naga,sub_colon_substation_67,138.0,3.5356787861277663,0.08,0.4,0.7,False,overhead,True,synthetic_v1
+line_synth_spur_005,v1_05naga,sub_naga_substation_16,138.0,3.4399393616998717,0.08,0.4,0.7,False,overhead,True,synthetic_v1
 line_synth_spur_006,v1_05therma,sub_osm_83,138.0,3.284203334467815,0.08,0.4,0.7,False,overhead,True,synthetic_v1
 line_synth_spur_007,v1_04babatngn,sub_babatngon_substation_20,138.0,7.321270073684526,0.08,0.4,0.7,False,overhead,True,synthetic_v1
 line_synth_spur_008,v1_04kananga,tower_0011,230.0,5.9975043367523435,0.05,0.4,0.9,False,overhead,True,synthetic_v1

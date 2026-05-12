@@ -67,13 +67,13 @@ slowest came in at 29.7 ms median, well inside the 100 ms rubric.
 
 ### Convergence and modelling
 
-- **NR convergence cliff at ~0.66 of full load.** Synthetic 13.8 kV
-  radial distribution feeders carry `r = 0.4 Ω/km, x = 0.4 Ω/km` —
-  cumulative voltage drop pushes the Jacobian into singularity at
-  heavy load. Two fix paths: (a) re-calibrate Phase 1 distribution
-  impedance downward (likely correct — these are overhead-conductor
-  values misapplied to short radial feeders) or (b) accept DC-only
-  results for morning / evening peak. Currently doing (b).
+- ~~**NR convergence cliff at ~0.66 of full load.**~~ **RESOLVED on Day 27.**
+  Recalibrated `DIST_R_OHM_PER_KM` 0.40→0.10 and `DIST_X_OHM_PER_KM`
+  0.40→0.15 across the three Phase 1 synthetic-feeder notebooks
+  (03, 09, 10). NR now converges for all three scenarios with no
+  DC fallback. Evening-peak `vm_pu_min` = 0.743 — operationally
+  stressed but well above the Jacobian-singularity threshold.
+  See Phase 2 journal Day 27.
 - **522 MW of load not in the load flow** because their host components
   are disconnected. Real-world fixes are not in Phase 2 scope:
   Panay–Negros submarine cable needs reconstruction (Phase 1 had it

@@ -13,3 +13,5 @@ sqlalchemy
 networkx
 asyncpg
 jupyter
+pytest
+httpx

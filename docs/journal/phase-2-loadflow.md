@@ -585,3 +585,99 @@ Phase 2 is now genuinely complete. The remaining open thread
 worth a return visit is the synthetic-feeder impedance issue
 (the NR convergence cliff at ~0.66 of full load) — but that
 sits parallel to Phase 3, not in front of it.
+
+---
+
+## Day 27 — Phase 1 feeder-impedance recalibration
+
+The convergence cliff was the headline open thread; revisiting
+it produced the biggest single quality improvement in the
+project so far. NR now converges at *all three* scenarios with
+no DC fallback.
+
+### The change
+
+Three Phase 1C notebooks (`03_synthetic_distribution.ipynb`,
+`09_iloilo_redistribution.ipynb`,
+`10_redistribute_provinces.ipynb`) each define
+`DIST_R_OHM_PER_KM = 0.40` and `DIST_X_OHM_PER_KM = 0.40` —
+overhead-conductor values misapplied to short synthetic radial
+feeders. A single `sed` pass per notebook:
+
+```
+DIST_R_OHM_PER_KM = 0.40  →  0.10
+DIST_X_OHM_PER_KM = 0.40  →  0.15
+```
+
+These are sensible underground-XLPE-cable-ish values for 13.8 kV
+distribution. `DIST_MAX_I_KA = 0.30` stays — that's a reporting
+parameter for `loading_percent`, not a convergence parameter.
+
+### Pipeline re-run
+
+```
+$ python scripts/run_phase1.py
+✓ pipeline complete in 39s
+✓ verified: 2959 buses, 2972 lines, dist load 2282 MW vs target
+2282 MW (drift 0.00%)
+```
+
+Row counts shifted slightly (2952→2959 buses, 2965→2972 lines)
+because the substation-merge step in Phase 1 picks a slightly
+different consolidation when the synthetic feeders have
+different impedance — a known effect; load total is unchanged
+within the orchestrator's ±5 % tolerance.
+
+```
+$ python scripts/run_phase2.py
+✓ pipeline complete in 23s
+✓ verified: 66 components, 7536 result rows, 3 scenarios
+```
+
+Topology audit unchanged at 66 components — recalibration
+doesn't connect new submarine cables, so the disconnected
+fragments are still disconnected. The 1 230-bus big component
+still carries 826 MW of in-service load.
+
+### The new load-flow numbers
+
+| Scenario | Factor | Mode (before) | Mode (after) | `vm_pu_min` (before) | `vm_pu_min` (after) |
+|---|---:|---|---|---:|---:|
+| off_peak | 0.40 | nr | nr | 0.766 | **0.903** |
+| morning_peak | 0.85 | dc | **nr** | — | 0.779 |
+| evening_peak | 0.95 | dc | **nr** | — | 0.743 |
+
+Per-province voltage minima at evening peak (the worst case):
+
+| Province | `vm_pu_min` | `n_under_0.95 / total` |
+|---|---:|---|
+| Negros Occidental | 0.743 | 190 / 190 (100 %) |
+| Cebu | 0.847 | 327 / 411 (80 %) |
+| Bohol | 0.852 | 154 / 182 (85 %) |
+| Negros Oriental | 0.893 | 46 / 118 (39 %) |
+| Eastern Samar | 0.895 | 17 / 25 (68 %) |
+| Samar | 0.928 | 11 / 46 (24 %) |
+| Leyte | 0.934 | 15 / 194 (8 %) |
+| Northern Samar | 0.953 | 0 / 20 |
+| Southern Leyte | 0.962 | 0 / 38 |
+
+Under-voltage at peak is now a real engineering signal: every
+NegOcc bus is below 0.95 because there's no local generation
+in NegOcc (Palinpinon ×2 is in NegOr, Therma is in Cebu).
+That's a Phase 3 calibration thread, not a numerical artifact.
+
+### Downstream effects
+
+- `load_flow_results.csv` now has `convergence_mode = 'nr'` for
+  all 7 536 rows — the DC fallback path is unused.
+- The Phase 2 closeout's "convergence cliff at ~0.66" open
+  thread is **resolved**.
+- `scripts/load_to_postgis.py` re-run loads the new CSVs in
+  ~0.6 s; all six GIST benchmarks still under 100 ms (slowest
+  26 ms).
+- One persistent line overload remains: `line_synth_spur_006`
+  Therma → `sub_osm_83` at ~180–195 % loading across all
+  scenarios. That's a `max_i_ka` undersizing on the generator
+  export spur (300 MW Therma dispatch into a line rated for
+  ~167 MVA). Independent of feeder impedance; a separate Phase
+  1 calibration concern.
