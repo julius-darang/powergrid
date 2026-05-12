@@ -1,11 +1,11 @@
 component_id,bus_count,edge_count,provinces,islands,bus_types,voltage_levels,has_submarine
 0,1230,1294,"Cebu(421),Leyte(194),Negros Occidental(190),Bohol(182),Negros Oriental(118),Samar(46),Southern Leyte(38),Eastern Samar(25),Northern Samar(16)","Cebu(421),Negros(308),Leyte(232),Bohol(182),Samar(87)","distribution(1134),substation(50),tower(42),generator(4)","13.8,60.0,69.0,138.0,230.0,350.0",True
-1,225,224,"Iloilo(158),Capiz(25),Aklan(21),Guimaras(21)","Panay(204),Guimaras(21)","distribution(214),substation(9),tower(1),generator(1)","13.8,69.0,138.0",True
+1,225,224,"Iloilo(158),Capiz(25),Guimaras(21),Aklan(21)","Panay(204),Guimaras(21)","distribution(214),substation(9),tower(1),generator(1)","13.8,69.0,138.0",True
 2,205,211,Cebu(205),Cebu(205),"distribution(191),substation(8),tower(6)","13.8,69.0,138.0",False
 3,50,49,Cebu(50),Cebu(50),"distribution(48),substation(2)","13.8,138.0",False
 4,50,50,Cebu(50),Cebu(50),"distribution(48),substation(2)","13.8,138.0,230.0",False
 5,30,30,Leyte(30),Leyte(30),"distribution(24),tower(5),substation(1)","13.8,138.0",False
-6,26,26,Northern Samar(26),Samar(26),"distribution(24),substation(1),tower(1)","13.8,69.0",False
+6,26,26,Northern Samar(26),Samar(26),"distribution(24),tower(1),substation(1)","13.8,69.0",False
 7,25,24,Negros Occidental(25),Negros(25),"distribution(24),substation(1)","13.8,69.0",False
 8,25,24,Cebu(25),Cebu(25),"distribution(24),substation(1)","13.8,138.0",False
 9,25,24,Negros Occidental(25),Negros(25),"distribution(24),substation(1)","13.8,138.0",False

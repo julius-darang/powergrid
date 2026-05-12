@@ -24,19 +24,21 @@ docs/
 | Phase | Journal                                        | Closeout                                            | Status      |
 | ----- | ---------------------------------------------- | --------------------------------------------------- | ----------- |
 | 1     | [phase-1-data.md](phase-1-data.md)             | [phase-1-closeout.md](../closeouts/phase-1-closeout.md) | **done**    |
-| 2     | [phase-2-loadflow.md](phase-2-loadflow.md)     | —                                                   | not started |
+| 2     | [phase-2-loadflow.md](phase-2-loadflow.md)     | [phase-2-closeout.md](../closeouts/phase-2-closeout.md) | **done**    |
 | 3     | API                                            | —                                                   | not started |
 | 4     | Frontend                                       | —                                                   | not started |
 | 5     | Polish                                         | —                                                   | not started |
 
 ## Current state in one line
 
-Phase 1 produced `backend/data/processed/buses.csv` (2 960 rows)
-and `lines.csv` (2 967 rows) with Visayas total peak 2 282 MW
-(1.04× real). Pipeline runs end-to-end in ~34 s via
-`python scripts/run_phase1.py`. See
-[phase-1-closeout.md](../closeouts/phase-1-closeout.md) for what's
-unresolved.
+Phase 2 produced `load_flow_results.csv` (7 572 rows, three
+scenarios — off-peak NR-converged, morning / evening on DC
+fallback) on the 1 230-bus mainland Visayas component out of
+2 952 total. Pipeline runs end-to-end in ~23 s via
+`python scripts/run_phase2.py`. See
+[phase-2-closeout.md](../closeouts/phase-2-closeout.md) for
+the convergence cliff and the 522 MW of fragment load still
+unmodelled.
 
 ## Conventions
 
