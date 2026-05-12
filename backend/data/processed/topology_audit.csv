@@ -1,0 +1,67 @@
+component_id,bus_count,edge_count,provinces,islands,bus_types,voltage_levels,has_submarine
+0,1230,1294,"Cebu(421),Leyte(194),Negros Occidental(190),Bohol(182),Negros Oriental(118),Samar(46),Southern Leyte(38),Eastern Samar(25),Northern Samar(16)","Cebu(421),Negros(308),Leyte(232),Bohol(182),Samar(87)","distribution(1134),substation(50),tower(42),generator(4)","13.8,60.0,69.0,138.0,230.0,350.0",True
+1,225,224,"Iloilo(158),Capiz(25),Aklan(21),Guimaras(21)","Panay(204),Guimaras(21)","distribution(214),substation(9),tower(1),generator(1)","13.8,69.0,138.0",True
+2,205,211,Cebu(205),Cebu(205),"distribution(191),substation(8),tower(6)","13.8,69.0,138.0",False
+3,50,49,Cebu(50),Cebu(50),"distribution(48),substation(2)","13.8,138.0",False
+4,50,50,Cebu(50),Cebu(50),"distribution(48),substation(2)","13.8,138.0,230.0",False
+5,30,30,Leyte(30),Leyte(30),"distribution(24),tower(5),substation(1)","13.8,138.0",False
+6,26,26,Northern Samar(26),Samar(26),"distribution(24),substation(1),tower(1)","13.8,69.0",False
+7,25,24,Negros Occidental(25),Negros(25),"distribution(24),substation(1)","13.8,69.0",False
+8,25,24,Cebu(25),Cebu(25),"distribution(24),substation(1)","13.8,138.0",False
+9,25,24,Negros Occidental(25),Negros(25),"distribution(24),substation(1)","13.8,138.0",False
+10,25,24,Leyte(25),Leyte(25),"distribution(24),substation(1)","13.8,138.0",False
+11,25,24,Bohol(25),Bohol(25),"distribution(24),substation(1)","13.8,138.0",False
+12,25,24,Leyte(25),Leyte(25),"distribution(24),substation(1)","13.8,138.0",False
+13,25,24,Cebu(25),Cebu(25),"distribution(24),substation(1)","13.8,138.0",False
+14,25,24,Leyte(25),Leyte(25),"distribution(24),substation(1)","13.8,138.0",False
+15,25,24,Samar(25),Samar(25),"distribution(24),substation(1)","13.8,138.0",False
+16,25,24,Northern Samar(25),Samar(25),"distribution(24),substation(1)","13.8,138.0",False
+17,25,24,Eastern Samar(25),Samar(25),"distribution(24),substation(1)","13.8,138.0",False
+18,25,24,Samar(25),Samar(25),"distribution(24),substation(1)","13.8,138.0",False
+19,25,24,Leyte(25),Leyte(25),"distribution(24),substation(1)","13.8,138.0",False
+20,25,24,Cebu(25),Cebu(25),"distribution(24),substation(1)","13.8,138.0",False
+21,25,24,Negros Occidental(25),Negros(25),"distribution(24),substation(1)","13.8,138.0",False
+22,25,24,Negros Occidental(25),Negros(25),"distribution(24),substation(1)","13.8,138.0",False
+23,25,24,Cebu(25),Cebu(25),"distribution(24),substation(1)","13.8,138.0",False
+24,25,24,Negros Oriental(25),Negros(25),"distribution(24),substation(1)","13.8,138.0",False
+25,25,24,Leyte(25),Leyte(25),"distribution(24),substation(1)","13.8,138.0",False
+26,25,24,Cebu(25),Cebu(25),"distribution(24),substation(1)","13.8,138.0",False
+27,25,24,Aklan(25),Panay(25),"distribution(24),substation_synth(1)","13.8,138.0",False
+28,25,24,Antique(25),Panay(25),"distribution(24),substation_synth(1)","13.8,138.0",False
+29,24,24,Negros Occidental(24),Negros(24),"distribution(20),tower(3),substation(1)","13.8,230.0",False
+30,24,23,Cebu(24),Cebu(24),"distribution(23),substation(1)","13.8,69.0",False
+31,23,22,Samar(23),Samar(23),"distribution(22),substation(1)","13.8,69.0",False
+32,23,22,Leyte(23),Leyte(23),"distribution(22),substation(1)","13.8,138.0",False
+33,23,22,Leyte(23),Leyte(23),"distribution(22),substation(1)","13.8,138.0",False
+34,22,21,Cebu(22),Cebu(22),"distribution(21),substation(1)","13.8,138.0",False
+35,22,21,Cebu(22),Cebu(22),"distribution(21),substation(1)","13.8,138.0",False
+36,22,21,Siquijor(22),Siquijor(22),"distribution(21),substation(1)","13.8,138.0",False
+37,22,21,Bohol(22),Bohol(22),"distribution(21),substation(1)","13.8,138.0",False
+38,21,20,Leyte(21),Leyte(21),"distribution(20),substation(1)","13.8,138.0",False
+39,21,20,Bohol(21),Bohol(21),"distribution(20),substation(1)","13.8,138.0",False
+40,21,20,Negros Oriental(21),Negros(21),"distribution(20),substation(1)","13.8,138.0",False
+41,21,20,Negros Oriental(21),Negros(21),"distribution(20),substation(1)","13.8,138.0",False
+42,21,20,Leyte(21),Leyte(21),"distribution(20),substation(1)","13.8,138.0",False
+43,20,19,Samar(20),Samar(20),"distribution(19),substation(1)","13.8,138.0",False
+44,20,19,Leyte(20),Leyte(20),"distribution(19),substation(1)","13.8,138.0",False
+45,20,19,Negros Oriental(20),Negros(20),"distribution(19),substation(1)","13.8,138.0",False
+46,20,19,Cebu(20),Cebu(20),"distribution(19),substation(1)","13.8,138.0",False
+47,19,18,Southern Leyte(19),Leyte(19),"distribution(18),substation(1)","13.8,138.0",False
+48,19,18,Samar(19),Samar(19),"distribution(18),substation(1)","13.8,138.0",False
+49,19,18,Leyte(19),Leyte(19),"distribution(18),substation(1)","13.8,138.0",False
+50,19,18,Cebu(19),Cebu(19),"distribution(18),substation(1)","13.8,138.0",False
+51,19,18,Biliran(19),Biliran(19),"distribution(18),substation(1)","13.8,138.0",False
+52,19,18,Cebu(19),Cebu(19),"distribution(18),substation(1)","13.8,138.0",False
+53,19,18,Negros Oriental(19),Negros(19),"distribution(18),substation(1)","13.8,138.0",False
+54,18,17,Negros Oriental(18),Negros(18),"distribution(17),substation(1)","13.8,138.0",False
+55,18,17,Negros Oriental(18),Negros(18),"distribution(17),substation(1)","13.8,138.0",False
+56,7,9,Leyte(7),Leyte(7),tower(7),69.0,False
+57,5,4,Eastern Samar(5),Samar(5),tower(5),138.0,True
+58,2,1,Negros Occidental(2),Negros(2),tower(2),138.0,False
+59,2,1,Negros Oriental(2),Negros(2),tower(2),138.0,False
+60,2,1,Eastern Samar(2),Samar(2),tower(2),138.0,True
+61,2,1,Eastern Samar(2),Samar(2),tower(2),138.0,True
+62,2,1,Eastern Samar(2),Samar(2),tower(2),138.0,True
+63,2,1,Eastern Samar(2),Samar(2),tower(2),138.0,True
+64,2,1,Eastern Samar(2),Samar(2),tower(2),138.0,True
+65,1,0,Bohol(1),Bohol(1),tower(1),138.0,False
