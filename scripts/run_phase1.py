@@ -42,6 +42,7 @@ NOTEBOOKS = [
     ('07_v1_line_synthesis.ipynb',    'Step 3: Panay MST + non-Panay spurs'),
     ('08_kabankalan_handconnect.ipynb', 'Step 3b: hand-coded Kabankalan ↔ Mabinay'),
     ('11_substation_merge.ipynb',     'Substation merge + redundant-virtual cleanup'),
+    ('13_voltage_inheritance.ipynb',  'Day 21: voltage inheritance for untagged OSM lines'),
     ('09_iloilo_redistribution.ipynb', 'Day 17: Iloilo distribution re-run'),
     ('10_redistribute_provinces.ipynb', 'Day 18: parametrised re-run for 8 provinces'),
     ('12_load_assignment.ipynb',      'Day 20: population-weighted load assignment'),
