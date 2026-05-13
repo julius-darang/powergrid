@@ -35,3 +35,6 @@ outputs/
 
 # --- Docker / Postgres data dir (if mounted locally) ---
 postgres_data/
+
+# --- Misc ---
+AGENTS.md 
