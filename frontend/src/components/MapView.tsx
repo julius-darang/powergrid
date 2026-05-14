@@ -13,27 +13,28 @@ import {
   type ScenarioName,
 } from '../api/client'
 import { busStyle, lineStyle } from '../viz/encoding'
+import type { Selection } from './InspectPanel'
 
-// Visayas extent — these are the four corners of the region the data
-// covers. Centring here lets the map open with the whole grid in view.
 const VISAYAS_CENTER: LatLngExpression = [10.7, 123.6]
 const VISAYAS_ZOOM = 7
 
 interface MapViewProps {
   scenario: ScenarioName | 'topology'
   province: string | null
+  selection: Selection
+  onSelect: (s: Selection) => void
+  // Hand the current FeatureCollection back up so the inspect panel can
+  // re-resolve the selected feature when mode/province changes.
+  onDataChange: (d: FeatureCollection | null) => void
 }
 
-export default function MapView({ scenario, province }: MapViewProps) {
+export default function MapView({
+  scenario, province, selection, onSelect, onDataChange,
+}: MapViewProps) {
   const [data, setData] = useState<FeatureCollection | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  // Pick the right endpoint based on (scenario, province). Four cases:
-  //   topology + no province → /api/grid/transmission (≥60 kV only)
-  //   topology + province    → /api/grid/province/{name} (full sub-grid)
-  //   loadflow + no province → /api/loadflow/{scenario} (system-wide)
-  //   loadflow + province    → /api/loadflow/{scenario}/{province}
   useEffect(() => {
     let cancelled = false
     setLoading(true)
@@ -44,11 +45,15 @@ export default function MapView({ scenario, province }: MapViewProps) {
     } else {
       p = province ? api.provinceLoadflow(scenario, province) : api.loadflow(scenario)
     }
-    p.then((d) => { if (!cancelled) setData(d) })
+    p.then((d) => {
+      if (cancelled) return
+      setData(d)
+      onDataChange(d)
+    })
       .catch((e) => { if (!cancelled) setError(String(e)) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [scenario, province])
+  }, [scenario, province, onDataChange])
 
   const { buses, lines } = useMemo(() => {
     if (!data) return { buses: [], lines: [] }
@@ -66,14 +71,38 @@ export default function MapView({ scenario, province }: MapViewProps) {
         center={VISAYAS_CENTER}
         zoom={VISAYAS_ZOOM}
         style={{ width: '100%', height: '100%' }}
-        preferCanvas={true}  /* Canvas renderer scales past SVG limits */
+        preferCanvas={true}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {lines.map((f) => <LineFeature key={featureKey(f)} f={f} mode={mode} />)}
-        {buses.map((f) => <BusFeature key={featureKey(f)} f={f} mode={mode} />)}
+        {lines.map((f) => {
+          const id = (f.properties as Record<string, unknown>).line_id as string
+          const isSelected = selection?.kind === 'line' && selection.id === id
+          return (
+            <LineFeature
+              key={id}
+              f={f}
+              mode={mode}
+              selected={isSelected}
+              onClick={() => onSelect({ kind: 'line', id })}
+            />
+          )
+        })}
+        {buses.map((f) => {
+          const id = (f.properties as Record<string, unknown>).bus_id as string
+          const isSelected = selection?.kind === 'bus' && selection.id === id
+          return (
+            <BusFeature
+              key={id}
+              f={f}
+              mode={mode}
+              selected={isSelected}
+              onClick={() => onSelect({ kind: 'bus', id })}
+            />
+          )
+        })}
         <FitToData features={data?.features ?? []} active={Boolean(province)} />
       </MapContainer>
       <StatusOverlay
@@ -86,13 +115,6 @@ export default function MapView({ scenario, province }: MapViewProps) {
   )
 }
 
-function featureKey(f: Feature): string {
-  const p = f.properties as Record<string, unknown>
-  return (p.bus_id as string) ?? (p.line_id as string) ?? Math.random().toString()
-}
-
-// Auto-pan/zoom when a province is selected. Reset to Visayas extent
-// when selection clears.
 function FitToData({ features, active }: { features: Feature[]; active: boolean }) {
   const map = useMap()
   useEffect(() => {
@@ -123,14 +145,31 @@ function computeBounds(features: Feature[]): LatLngBounds | null {
   return L.latLngBounds(pts)
 }
 
-function BusFeature({ f, mode }: { f: Feature; mode: 'topology' | 'loadflow' }) {
+interface FeatureRenderProps {
+  f: Feature
+  mode: 'topology' | 'loadflow'
+  selected: boolean
+  onClick: () => void
+}
+
+function BusFeature({ f, mode, selected, onClick }: FeatureRenderProps) {
   const p = f.properties as unknown as BusProps
   const geom = f.geometry as { type: 'Point'; coordinates: [number, number] } | null
   if (!geom) return null
   const [lon, lat] = geom.coordinates
-  const style = busStyle(p, mode)
+  const base = busStyle(p, mode)
+  // Selection ring: thicker stroke + dark outline. Doesn't change fill so
+  // the underlying voltage/vm_pu color is still readable.
+  const style = selected
+    ? { ...base, color: '#0f172a', weight: 3, radius: base.radius + 2 }
+    : base
   return (
-    <CircleMarker center={[lat, lon] as LatLngTuple} pathOptions={style} radius={style.radius}>
+    <CircleMarker
+      center={[lat, lon] as LatLngTuple}
+      pathOptions={style}
+      radius={style.radius}
+      eventHandlers={{ click: onClick }}
+    >
       <Tooltip direction="top" sticky>
         <BusTooltip p={p} />
       </Tooltip>
@@ -138,14 +177,17 @@ function BusFeature({ f, mode }: { f: Feature; mode: 'topology' | 'loadflow' }) 
   )
 }
 
-function LineFeature({ f, mode }: { f: Feature; mode: 'topology' | 'loadflow' }) {
+function LineFeature({ f, mode, selected, onClick }: FeatureRenderProps) {
   const p = f.properties as unknown as LineProps
   const geom = f.geometry as { type: 'LineString'; coordinates: [number, number][] } | null
   if (!geom) return null
   const path = geom.coordinates.map(([lon, lat]) => [lat, lon] as LatLngTuple)
-  const style = lineStyle(p, mode)
+  const base = lineStyle(p, mode)
+  const style = selected
+    ? { ...base, color: '#0f172a', weight: (base.weight ?? 2) + 2, opacity: 1 }
+    : base
   return (
-    <Polyline positions={path} pathOptions={style}>
+    <Polyline positions={path} pathOptions={style} eventHandlers={{ click: onClick }}>
       <Tooltip sticky>
         <LineTooltip p={p} />
       </Tooltip>
