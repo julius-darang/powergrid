@@ -14,6 +14,7 @@ import {
 } from '../api/client'
 import { busStyle, lineStyle } from '../viz/encoding'
 import type { Selection } from './InspectPanel'
+import type { Scope } from '../scope'
 import Legend from './Legend'
 
 const VISAYAS_CENTER: LatLngExpression = [10.7, 123.6]
@@ -21,31 +22,36 @@ const VISAYAS_ZOOM = 7
 
 interface MapViewProps {
   scenario: ScenarioName | 'topology'
-  province: string | null
+  scope: Scope
   selection: Selection
   onSelect: (s: Selection) => void
   // Hand the current FeatureCollection back up so the inspect panel can
-  // re-resolve the selected feature when mode/province changes.
+  // re-resolve the selected feature when mode/scope changes.
   onDataChange: (d: FeatureCollection | null) => void
 }
 
 export default function MapView({
-  scenario, province, selection, onSelect, onDataChange,
+  scenario, scope, selection, onSelect, onDataChange,
 }: MapViewProps) {
   const [data, setData] = useState<FeatureCollection | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
+  // Six cases: (topology|loadflow) × (all|island|province).
   useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
-    let p: Promise<FeatureCollection>
-    if (scenario === 'topology') {
-      p = province ? api.provinceGrid(province) : api.transmission()
-    } else {
-      p = province ? api.provinceLoadflow(scenario, province) : api.loadflow(scenario)
-    }
+    const p: Promise<FeatureCollection> = (() => {
+      if (scenario === 'topology') {
+        if (scope.kind === 'province') return api.provinceGrid(scope.name)
+        if (scope.kind === 'island')   return api.islandGrid(scope.name)
+        return api.transmission()
+      }
+      if (scope.kind === 'province') return api.provinceLoadflow(scenario, scope.name)
+      if (scope.kind === 'island')   return api.islandLoadflow(scenario, scope.name)
+      return api.loadflow(scenario)
+    })()
     p.then((d) => {
       if (cancelled) return
       setData(d)
@@ -54,7 +60,7 @@ export default function MapView({
       .catch((e) => { if (!cancelled) setError(String(e)) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [scenario, province, onDataChange])
+  }, [scenario, scope, onDataChange])
 
   const { buses, lines } = useMemo(() => {
     if (!data) return { buses: [], lines: [] }
@@ -104,13 +110,13 @@ export default function MapView({
             />
           )
         })}
-        <FitToData features={data?.features ?? []} active={Boolean(province)} />
+        <FitToData features={data?.features ?? []} active={scope.kind !== 'all'} />
       </MapContainer>
       <StatusOverlay
         loading={loading}
         error={error}
         count={data?.features.length ?? 0}
-        province={province}
+        scope={scope}
       />
       <Legend mode={mode} />
     </div>
@@ -222,8 +228,9 @@ function LineTooltip({ p }: { p: LineProps }) {
 }
 
 function StatusOverlay({
-  loading, error, count, province,
-}: { loading: boolean; error: string | null; count: number; province: string | null }) {
+  loading, error, count, scope,
+}: { loading: boolean; error: string | null; count: number; scope: Scope }) {
+  const label = scope.kind === 'all' ? 'Visayas' : scope.name
   return (
     <div style={{
       position: 'absolute', top: 8, right: 8, zIndex: 1000,
@@ -234,7 +241,7 @@ function StatusOverlay({
       {!loading && error && <span style={{ color: '#b91c1c' }}>{error}</span>}
       {!loading && !error && (
         <span>
-          {province ? <strong>{province}</strong> : 'Visayas'}
+          {scope.kind === 'all' ? label : <strong>{label}</strong>}
           {' · '}{count.toLocaleString()} features
         </span>
       )}

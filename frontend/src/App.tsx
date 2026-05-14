@@ -1,8 +1,9 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import MapView from './components/MapView'
 import Sidebar from './components/Sidebar'
 import InspectPanel, { type Selection } from './components/InspectPanel'
-import type { Feature, FeatureCollection, ScenarioName } from './api/client'
+import { api, type Feature, type FeatureCollection, type ProvincesResponse, type ScenarioName } from './api/client'
+import { type Scope } from './scope'
 import './App.css'
 
 type Mode = 'topology' | ScenarioName
@@ -16,13 +17,30 @@ const MODES: { value: Mode; label: string; help: string }[] = [
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('topology')
-  const [province, setProvince] = useState<string | null>(null)
+  const [scope, setScope] = useState<Scope>({ kind: 'all' })
   const [selection, setSelection] = useState<Selection>(null)
   const [data, setData] = useState<FeatureCollection | null>(null)
 
-  // Resolve the live feature for the inspect panel from the current
-  // FeatureCollection. Selection is stored by id, so swapping scenarios
-  // updates vm_pu / loading_percent without re-clicking.
+  // Province metadata fetched once at app load. Powers both the
+  // sidebar (grouped list) and the header (island dropdown derived
+  // from the unique islands), and lets the header subtitle resolve
+  // a selected province's island.
+  const [provinces, setProvinces] = useState<ProvincesResponse['provinces'] | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    api.provinces()
+      .then((d) => { if (!cancelled) setProvinces(d.provinces) })
+      .catch(() => { /* sidebar surfaces the error */ })
+    return () => { cancelled = true }
+  }, [])
+
+  const islands = useMemo(() => {
+    if (!provinces) return [] as string[]
+    return Array.from(new Set(provinces.map((p) => p.island).filter(Boolean))).sort() as string[]
+  }, [provinces])
+
+  // Re-resolve the selected feature against the live FeatureCollection so
+  // the inspect panel updates vm_pu / loading_percent on mode change.
   const selectedFeature = useMemo<Feature | null>(() => {
     if (!selection || !data) return null
     const key = selection.kind === 'bus' ? 'bus_id' : 'line_id'
@@ -33,6 +51,16 @@ export default function App() {
 
   const handleDataChange = useCallback((d: FeatureCollection | null) => setData(d), [])
 
+  // Synthetic counts (current view) — drives the disclaimer badge.
+  const syntheticStats = useMemo(() => {
+    if (!data) return { synthetic: 0, total: 0 }
+    let synth = 0
+    for (const f of data.features) {
+      if ((f.properties as Record<string, unknown>).is_synthetic) synth++
+    }
+    return { synthetic: synth, total: data.features.length }
+  }, [data])
+
   return (
     <div className="app-root">
       <header className="app-header">
@@ -40,30 +68,53 @@ export default function App() {
           <h1>Philippine Power Grid</h1>
           <span className="app-subtitle">
             Visayas · {mode === 'topology' ? 'topology' : `${MODES.find((m) => m.value === mode)?.label.toLowerCase()} load flow`}
-            {province && <> · <strong>{province}</strong></>}
+            {scope.kind !== 'all' && <> · <strong>{scope.name}</strong></>}
           </span>
         </div>
-        <div className="scenario-switch" role="radiogroup" aria-label="Scenario">
-          {MODES.map((m) => (
-            <button
-              key={m.value}
-              role="radio"
-              aria-checked={mode === m.value}
-              title={m.help}
-              className={mode === m.value ? 'active' : ''}
-              onClick={() => setMode(m.value)}
+
+        <div className="header-controls">
+          <SyntheticBadge {...syntheticStats} />
+
+          <label className="island-filter" title="Filter map to one island">
+            <span>Island:</span>
+            <select
+              value={scope.kind === 'island' ? scope.name : ''}
+              onChange={(e) => {
+                const v = e.target.value
+                setScope(v ? { kind: 'island', name: v } : { kind: 'all' })
+              }}
             >
-              {m.label}
-            </button>
-          ))}
+              <option value="">All Visayas</option>
+              {islands.map((i) => <option key={i} value={i}>{i}</option>)}
+            </select>
+          </label>
+
+          <div className="scenario-switch" role="radiogroup" aria-label="Scenario">
+            {MODES.map((m) => (
+              <button
+                key={m.value}
+                role="radio"
+                aria-checked={mode === m.value}
+                title={m.help}
+                className={mode === m.value ? 'active' : ''}
+                onClick={() => setMode(m.value)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
       <div className="app-body">
-        <Sidebar selected={province} onSelect={setProvince} />
+        <Sidebar
+          provinces={provinces}
+          scope={scope}
+          onSelect={(name) => setScope(name ? { kind: 'province', name } : { kind: 'all' })}
+        />
         <main className="app-map">
           <MapView
             scenario={mode}
-            province={province}
+            scope={scope}
             selection={selection}
             onSelect={setSelection}
             onDataChange={handleDataChange}
@@ -76,5 +127,22 @@ export default function App() {
         />
       </div>
     </div>
+  )
+}
+
+function SyntheticBadge({ synthetic, total }: { synthetic: number; total: number }) {
+  if (total === 0) return null
+  const pct = (synthetic / total) * 100
+  // Threshold: fade the badge for tiny synthetic minorities (< 5 %).
+  // The Visayas dataset is ~50 % synthetic at evening_peak so the
+  // badge is almost always loud.
+  const level = pct >= 25 ? 'high' : pct >= 5 ? 'mid' : 'low'
+  return (
+    <span
+      className={'synthetic-badge synthetic-' + level}
+      title="Some elements are synthetic (population-weighted distribution feeders, hand-curated spurs). Synthetic buses render hollow; synthetic lines render dashed. See BUILD_JOURNAL for the data provenance."
+    >
+      ⚠ {pct.toFixed(0)}% synthetic
+    </span>
   )
 }
