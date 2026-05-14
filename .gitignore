@@ -38,3 +38,9 @@ postgres_data/
 
 # --- Misc ---
 AGENTS.md 
+# --- Frontend (Vite/React) ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+# Generated TS types from backend OpenAPI — regenerate with `npm run codegen`.
+frontend/src/api/schema.gen.ts

@@ -94,6 +94,41 @@ async def loadflow_province(scenario: str, province: str):
     return {'type': 'FeatureCollection', 'features': feats}
 
 
+@router.get('/api/loadflow/{scenario}/island/{island}', response_model=FeatureCollection)
+async def loadflow_island(scenario: str, island: str):
+    _check_scenario(scenario)
+    async with acquire() as conn:
+        exists = await conn.fetchval(
+            'SELECT 1 FROM buses WHERE island = $1 LIMIT 1', island
+        )
+        if not exists:
+            raise HTTPException(404, f'island not found: {island}')
+        buses = await conn.fetch(
+            _BUS_LOADFLOW_SQL + ' WHERE b.island = $2', scenario, island,
+        )
+        # Lines: either endpoint in the island. DISTINCT ON since a line
+        # joins twice when both endpoints sit in the island. Mirrors the
+        # province variant above.
+        line_sql = (
+            "SELECT DISTINCT ON (l.line_id) l.line_id, l.from_bus, l.to_bus, "
+            "l.voltage_kv, l.length_km, l.is_submarine, l.cable_type, "
+            "l.is_synthetic, l.data_source, "
+            "r.loading_percent, r.p_from_mw, r.p_to_mw, r.convergence_mode, "
+            "ST_AsGeoJSON(l.geom)::json AS geom_json "
+            "FROM lines l "
+            "LEFT JOIN load_flow_results r "
+            "  ON r.line_id = l.line_id AND r.scenario = $1 "
+            "JOIN buses b ON l.from_bus = b.bus_id OR l.to_bus = b.bus_id "
+            "WHERE b.island = $2"
+        )
+        lines = await conn.fetch(line_sql, scenario, island)
+    feats = (
+        rows_to_collection(buses, BUS_PROP_COLS)['features']
+        + rows_to_collection(lines, LINE_PROP_COLS)['features']
+    )
+    return {'type': 'FeatureCollection', 'features': feats}
+
+
 @router.get('/api/provinces', response_model=ProvincesResponse)
 async def provinces():
     """Sidebar payload: per-province counts and total connected load.
