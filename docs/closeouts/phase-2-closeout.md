@@ -184,11 +184,15 @@ The remaining Phase 3 threads:
 
 Parallel calibration threads worth flagging:
 
-- **Therma export spur (`line_synth_spur_006`)** at 180–195 %
-  loading. Bump `max_i_ka` from 0.7 to ~1.5 on the spur, or
-  split Therma dispatch across multiple buses.
-- **NegOcc local generation.** Adding 100–200 MW of generation
-  on the NegOcc side of Negros would lift the entire province
-  out of undervoltage at evening peak. Real candidates: La
-  Carlota / Mindanao-Visayas interconnect terminus / additional
-  Cebu plants.
+- ~~**Therma export spur (`line_synth_spur_006`)** at 180–195 %
+  loading.~~ **RESOLVED on Day 28.** `SPUR_OVERRIDES` table in
+  notebook 13 §3a bumps `max_i_ka` 0.7 → 1.5; loading dropped to
+  ~84 % across all scenarios. Phase 2 journal Day 28.
+- ~~**NegOcc local generation.**~~ **Partially resolved on Day 28.**
+  Added Helios solar (150 MW) and Bacolod biomass (80 MW) at
+  `sub_osm_80` and `v1_06bacolod`. NegOcc evening_peak min `vm_pu`
+  0.743 → 0.829; buses < 0.95 went from 100 % to 63 %. Closeout's
+  100–200 MW estimate was light — 230 MW lifts NegOcc out of acute
+  undervoltage but not above 0.95. Pushing further needs scenario-
+  specific gen dispatch (Helios at 150 MW is unrealistic at evening
+  peak — PV output is near zero). Phase 2 journal Day 28.
