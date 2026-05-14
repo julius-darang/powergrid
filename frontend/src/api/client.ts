@@ -61,6 +61,13 @@ async function getJSON<T>(path: string): Promise<T> {
 export const api = {
   transmission: () => getJSON<FeatureCollection>('/api/grid/transmission'),
   loadflow: (s: ScenarioName) => getJSON<FeatureCollection>(`/api/loadflow/${s}`),
+  // Province-scoped variants — used when the sidebar selection narrows the map.
+  // `provinceGrid` returns the full sub-transmission + distribution within the
+  // province (no load-flow join); `provinceLoadflow` joins per-scenario results.
+  provinceGrid: (name: string) =>
+    getJSON<FeatureCollection>(`/api/grid/province/${encodeURIComponent(name)}`),
+  provinceLoadflow: (s: ScenarioName, name: string) =>
+    getJSON<FeatureCollection>(`/api/loadflow/${s}/${encodeURIComponent(name)}`),
   scenarios: () => getJSON<ScenariosResponse>('/api/scenarios'),
   provinces: () => getJSON<ProvincesResponse>('/api/provinces'),
   health: () => getJSON<Health>('/api/health'),

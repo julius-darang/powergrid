@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CircleMarker, MapContainer, Polyline, TileLayer, Tooltip } from 'react-leaflet'
-import type { LatLngExpression, LatLngTuple } from 'leaflet'
+import { CircleMarker, MapContainer, Polyline, TileLayer, Tooltip, useMap } from 'react-leaflet'
+import L, { type LatLngBounds, type LatLngExpression, type LatLngTuple } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import {
   api,
@@ -21,30 +21,35 @@ const VISAYAS_ZOOM = 7
 
 interface MapViewProps {
   scenario: ScenarioName | 'topology'
+  province: string | null
 }
 
-export default function MapView({ scenario }: MapViewProps) {
+export default function MapView({ scenario, province }: MapViewProps) {
   const [data, setData] = useState<FeatureCollection | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  // Re-fetch whenever the scenario flips. Topology mode uses the
-  // /transmission endpoint (60 kV+); load-flow mode pulls the full
-  // /loadflow/{scenario} with vm_pu / loading_percent joined in.
+  // Pick the right endpoint based on (scenario, province). Four cases:
+  //   topology + no province → /api/grid/transmission (≥60 kV only)
+  //   topology + province    → /api/grid/province/{name} (full sub-grid)
+  //   loadflow + no province → /api/loadflow/{scenario} (system-wide)
+  //   loadflow + province    → /api/loadflow/{scenario}/{province}
   useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
-    const p = scenario === 'topology' ? api.transmission() : api.loadflow(scenario)
+    let p: Promise<FeatureCollection>
+    if (scenario === 'topology') {
+      p = province ? api.provinceGrid(province) : api.transmission()
+    } else {
+      p = province ? api.provinceLoadflow(scenario, province) : api.loadflow(scenario)
+    }
     p.then((d) => { if (!cancelled) setData(d) })
       .catch((e) => { if (!cancelled) setError(String(e)) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [scenario])
+  }, [scenario, province])
 
-  // Split features once per data change. Buses render as CircleMarkers,
-  // lines as Polylines — the FeatureCollection is mixed so we narrow
-  // by geometry.type here.
   const { buses, lines } = useMemo(() => {
     if (!data) return { buses: [], lines: [] }
     return {
@@ -69,8 +74,14 @@ export default function MapView({ scenario }: MapViewProps) {
         />
         {lines.map((f) => <LineFeature key={featureKey(f)} f={f} mode={mode} />)}
         {buses.map((f) => <BusFeature key={featureKey(f)} f={f} mode={mode} />)}
+        <FitToData features={data?.features ?? []} active={Boolean(province)} />
       </MapContainer>
-      <StatusOverlay loading={loading} error={error} count={data?.features.length ?? 0} />
+      <StatusOverlay
+        loading={loading}
+        error={error}
+        count={data?.features.length ?? 0}
+        province={province}
+      />
     </div>
   )
 }
@@ -78,6 +89,38 @@ export default function MapView({ scenario }: MapViewProps) {
 function featureKey(f: Feature): string {
   const p = f.properties as Record<string, unknown>
   return (p.bus_id as string) ?? (p.line_id as string) ?? Math.random().toString()
+}
+
+// Auto-pan/zoom when a province is selected. Reset to Visayas extent
+// when selection clears.
+function FitToData({ features, active }: { features: Feature[]; active: boolean }) {
+  const map = useMap()
+  useEffect(() => {
+    if (!active) {
+      map.setView(VISAYAS_CENTER, VISAYAS_ZOOM)
+      return
+    }
+    const bounds = computeBounds(features)
+    if (bounds) map.fitBounds(bounds, { padding: [30, 30] })
+  }, [features, active, map])
+  return null
+}
+
+function computeBounds(features: Feature[]): LatLngBounds | null {
+  const pts: LatLngTuple[] = []
+  for (const f of features) {
+    if (!f.geometry) continue
+    if (f.geometry.type === 'Point') {
+      const [lon, lat] = (f.geometry as { coordinates: [number, number] }).coordinates
+      pts.push([lat, lon])
+    } else if (f.geometry.type === 'LineString') {
+      for (const [lon, lat] of (f.geometry as { coordinates: [number, number][] }).coordinates) {
+        pts.push([lat, lon])
+      }
+    }
+  }
+  if (pts.length === 0) return null
+  return L.latLngBounds(pts)
 }
 
 function BusFeature({ f, mode }: { f: Feature; mode: 'topology' | 'loadflow' }) {
@@ -134,7 +177,9 @@ function LineTooltip({ p }: { p: LineProps }) {
   )
 }
 
-function StatusOverlay({ loading, error, count }: { loading: boolean; error: string | null; count: number }) {
+function StatusOverlay({
+  loading, error, count, province,
+}: { loading: boolean; error: string | null; count: number; province: string | null }) {
   return (
     <div style={{
       position: 'absolute', top: 8, right: 8, zIndex: 1000,
@@ -143,7 +188,12 @@ function StatusOverlay({ loading, error, count }: { loading: boolean; error: str
     }}>
       {loading && <span>Loading…</span>}
       {!loading && error && <span style={{ color: '#b91c1c' }}>{error}</span>}
-      {!loading && !error && <span>{count.toLocaleString()} features</span>}
+      {!loading && !error && (
+        <span>
+          {province ? <strong>{province}</strong> : 'Visayas'}
+          {' · '}{count.toLocaleString()} features
+        </span>
+      )}
     </div>
   )
 }

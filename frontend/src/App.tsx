@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import MapView from './components/MapView'
+import Sidebar from './components/Sidebar'
 import type { ScenarioName } from './api/client'
 import './App.css'
 
@@ -14,6 +15,7 @@ const MODES: { value: Mode; label: string; help: string }[] = [
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('topology')
+  const [province, setProvince] = useState<string | null>(null)
   return (
     <div className="app-root">
       <header className="app-header">
@@ -33,9 +35,12 @@ export default function App() {
           ))}
         </div>
       </header>
-      <main className="app-map">
-        <MapView scenario={mode} />
-      </main>
+      <div className="app-body">
+        <Sidebar selected={province} onSelect={setProvince} />
+        <main className="app-map">
+          <MapView scenario={mode} province={province} />
+        </main>
+      </div>
     </div>
   )
 }
