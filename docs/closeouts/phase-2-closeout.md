@@ -8,33 +8,37 @@
 
 ## The artifact in one paragraph
 
-Phase 2 produces a working pandapower model of the connected mainland
-Visayas (Cebu + Negros + Leyte + Bohol + Samar, 1 230 buses in the
-big connected component) and three-scenario load-flow results.
-Newton–Raphson converges at off-peak (×0.40, 330 MW); morning and
-evening peak load fall back to DC. The pipeline runs end-to-end in
-~23 s via `python scripts/run_phase2.py`. All deliverables also live
-in PostGIS — `scripts/load_to_postgis.py` round-trips the CSVs into
-the `buses` / `lines` / `load_flow_results` tables (under 1 s) and
-benchmarks the six API access patterns from the v2 plan §3.2; the
-slowest came in at 29.7 ms median, well inside the 100 ms rubric.
+Phase 2 produces a working pandapower model of the connected
+mainland Visayas (Cebu + Negros + Leyte + Bohol + Samar — 1 230
+buses in the big connected component, out of 2 959 total) and
+three-scenario load-flow results. After the Day 27 Phase 1
+feeder-impedance recalibration, **Newton–Raphson converges
+cleanly for all three scenarios** with no DC fallback —
+off-peak `vm_pu_min = 0.903`, morning peak 0.779, evening peak
+0.743. The pipeline runs end-to-end in ~23 s via
+`python scripts/run_phase2.py`. All deliverables also live in
+PostGIS — `scripts/load_to_postgis.py` round-trips the CSVs
+into the `buses` / `lines` / `load_flow_results` tables in
+~0.6 s and benchmarks the six API access patterns from the v2
+plan §3.2; slowest is 26 ms median, well inside the 100 ms
+rubric.
 
 ## What lives where
 
 | File | What it is |
 |---|---|
 | `backend/data/processed/topology_audit.csv` | 66 connected components — Big component (#0) has 1 230 buses across 5 islands; rest are fragments |
-| `backend/data/processed/bus_component_map.csv` | 2 952 rows — `bus_id → component_id` |
-| `backend/data/processed/pp_network.json` | Assembled pandapower network: 2 952 buses (1 230 in service), 2 418 lines (1 038 in service), 547 transformers (256 in service), 4 generators, 1 ext_grid slack |
+| `backend/data/processed/bus_component_map.csv` | 2 959 rows — `bus_id → component_id` |
+| `backend/data/processed/pp_network.json` | Assembled pandapower network: 2 959 buses (1 230 in service), 2 425 lines (1 038 in service), 547 transformers (256 in service), 4 generators, 1 ext_grid slack |
 | `backend/data/processed/bus_index_map.csv` | `bus_id ↔ pp_index` for joining results back to canonical IDs |
-| `backend/data/processed/load_flow_results.csv` | 7 572 rows — long-format, schema matches `init.sql.load_flow_results` for mechanical PostGIS load |
-| `backend/data/processed/load_flow_summary.csv` | 3 rows — per-scenario convergence mode, voltage range, slack import |
+| `backend/data/processed/load_flow_results.csv` | 7 536 rows — long-format, all `convergence_mode = 'nr'`, schema matches `init.sql.load_flow_results` |
+| `backend/data/processed/load_flow_summary.csv` | 3 rows — per-scenario mode, voltage range, slack import |
 | `backend/data/processed/loadflow_audit.csv` | 27 rows — per-(scenario, province) voltage and angle stats |
 | `backend/data/processed/loadflow_coverage.csv` | 16 rows — per-province in-service coverage |
 | `scripts/run_phase2.py` | Orchestrator — 4 notebooks chained, post-condition assertions |
 | `notebooks/12_topology_audit.ipynb` | NetworkX connected-components audit |
 | `notebooks/13_pandapower_build.ipynb` | Network build: buses, lines/transformers split, loads, gens, slack |
-| `notebooks/14_loadflow.ipynb` | Three-scenario load flow (NR + DC fallback) |
+| `notebooks/14_loadflow.ipynb` | Three-scenario load flow (NR + DC fallback path retained as safety net) |
 | `notebooks/15_loadflow_audit.ipynb` | Per-province voltage/loading audit |
 | `scripts/load_to_postgis.py` | 2A loader + GIST benchmark — idempotent CSV→DB round-trip |
 
@@ -53,15 +57,22 @@ slowest came in at 29.7 ms median, well inside the 100 ms rubric.
   Biliran 22, Siquijor 15.
 - **Generator dispatch (hand-curated):** Therma Visayas 300 MW,
   Tongonan 120, Palinpinon 1 100, Palinpinon 2 80 = 600 MW total.
-  Slack absorbs the difference (off-peak exports −232 MW, evening
-  imports +184 MW).
-- **Off-peak NR voltage health is poor.** Negros Occidental
-  `vm_pu_min = 0.766` (153/190 buses < 0.95); Cebu `vm_pu_min = 0.823`
-  (242/421 < 0.95); Bohol `vm_pu_min = 0.883`. Best: Southern Leyte 0.935.
+  Slack at Ormoc 350 kV absorbs the difference: off-peak exports
+  −243 MW (Visayas → Luzon), morning peak imports +134 MW, evening
+  peak imports +223 MW.
+- **Post-recalibration voltage profile** (Day 27 onward). Off-peak
+  `vm_pu_min = 0.903` (was 0.766 with the original 0.40/0.40
+  feeder impedance). Evening peak `vm_pu_min = 0.743`, with
+  Negros Occidental at 100 % of buses under 0.95 — operationally
+  stressed, but the Jacobian solves cleanly. The collapse is a
+  real engineering signal (NegOcc has no local generation —
+  Palinpinon×2 is in NegOr, Therma is in Cebu) rather than a
+  numerical artifact.
 - **Persistent line overload:** `line_synth_spur_006` from Therma to
-  `sub_osm_83` at 138 kV reports 168-180 % loading across all three
+  `sub_osm_83` at 138 kV reports 180–195 % loading across all three
   scenarios. Generator export line under-rated (`max_i_ka = 0.7` for
-  300 MW gen export). Phase 1 calibration concern.
+  300 MW gen export ≈ 167 MVA capacity). Phase 1 calibration
+  concern; independent of feeder impedance.
 
 ## Open threads carried into Phase 3
 
@@ -104,9 +115,15 @@ slowest came in at 29.7 ms median, well inside the 100 ms rubric.
 
 ### Process
 
-- **Empty scaffolding still empty.** `backend/services/`,
-  `backend/routers/`, `backend/models/`, `frontend/src/components/`,
-  `frontend/src/hooks/`. No FastAPI, no React.
+- ~~**Empty backend scaffolding.**~~ **RESOLVED on Day 27 by the
+  Phase 3 scaffold.** `backend/main.py`, `backend/db/connection.py`,
+  `backend/routers/{grid,analysis}.py`, `backend/services/geo.py`,
+  `backend/models/schemas.py`, `backend/tests/test_api.py` now
+  populated. Nine endpoints live and verified. See
+  [phase-3-api.md Day 27](../journal/phase-3-api.md).
+- **Empty frontend scaffolding.** `frontend/src/components/`,
+  `frontend/src/hooks/` still empty. No React, no Leaflet.
+  Phase 4 work.
 
 ## Resolved during Phase 2
 
@@ -119,23 +136,59 @@ slowest came in at 29.7 ms median, well inside the 100 ms rubric.
   installed; container runs; `scripts/load_to_postgis.py` round-
   trips all three CSVs and benchmarks the six API access patterns.
   The single slowest query (`province_filter_lines_via_buses` —
-  `lines JOIN buses` with `OR` on `from_bus`/`to_bus`) is
-  29.7 ms median, 29.7 ms max. The KNN nearest-bus query is sub-
-  millisecond. `init.sql` now also includes the `convergence_mode`
-  column on `load_flow_results` (Phase 2 added it inline; now it's
-  in the canonical schema for future container starts).
+  `lines JOIN buses` with `OR` on `from_bus`/`to_bus`) is ~26 ms
+  median. The KNN nearest-bus query is sub-millisecond.
+  `init.sql` now also includes the `convergence_mode` column on
+  `load_flow_results` (Phase 2 added it inline; now it's in the
+  canonical schema for future container starts).
+- **NR convergence cliff at ~0.66 of full load.** Day 27 Phase 1
+  recalibration lowered `DIST_R_OHM_PER_KM` (0.40 → 0.10) and
+  `DIST_X_OHM_PER_KM` (0.40 → 0.15) across the three synthetic-
+  distribution notebooks. NR now converges for all three scenarios;
+  the DC fallback path is unused. Off-peak `vm_pu_min` improved
+  from 0.766 to 0.903. See
+  [phase-2-loadflow.md Day 27](../journal/phase-2-loadflow.md).
+- **Phase 3 FastAPI scaffold.** Built in parallel with the Day 27
+  recalibration via dispatched subagent. Nine endpoints
+  (`/api/health`, `/api/scenarios`, `/api/provinces`,
+  `/api/grid/{transmission,province/...,island/...,viewport}`,
+  `/api/loadflow/{scenario,scenario/province}`), all verified
+  end-to-end with curl + pytest. Two integration bugs fixed
+  (`DISTINCT` over `json` columns; bogus `in_service_bus_count`
+  filter). See [phase-3-api.md Day 27](../journal/phase-3-api.md).
 
 ## Where Phase 3 picks up
 
-PostGIS is live and seeded. The natural next move is the FastAPI
-backend per `power-grid-viz-plan-v2.md` §4 — endpoints
-`/api/grid/transmission`, `/api/loadflow/{scenario}`,
-`/api/provinces`. The empty `backend/services/` and
-`backend/routers/` directories are waiting. The six benchmarked
-queries already cover the four most common access patterns
-(viewport, province filter, KNN), so each endpoint is one
-SQL-template-and-marshal step from working.
+**Phase 3 has already started** — the FastAPI scaffold landed on
+Day 27 alongside the Phase 1 recalibration. Nine endpoints live,
+two pytest sanity tests passing, all six benchmarked access
+patterns powered by `ST_AsGeoJSON(geom)::json` direct from
+PostGIS.
 
-A parallel calibration thread is also worth flagging: the
-Phase 1 synthetic-feeder impedance issue (the convergence cliff)
-is independent of API work and could be done in either order.
+The remaining Phase 3 threads:
+
+1. **Frontend (Phase 4 of v2 plan).** React + Leaflet consuming
+   the API. The empty `frontend/src/{components,hooks}/`
+   directories are next.
+2. **API tightening.** Pydantic schemas are loose
+   (`properties: dict[str, Any]`) so FastAPI doesn't re-validate
+   3 000+ features per request — once the frontend pins what
+   it actually consumes, narrow the schemas for `/docs`.
+3. **Export endpoints** (`/api/export/{png,pdf}`). Deferred per
+   the v2 plan; Phase 5 polish.
+4. **CORS tightening.** Allow-all currently; pin to the frontend
+   host once Phase 4 lands.
+5. **Pagination.** `/api/loadflow/evening_peak` returns 5 931
+   features in one ~3 MB payload. Fine for dev; revisit if
+   response size becomes a real concern.
+
+Parallel calibration threads worth flagging:
+
+- **Therma export spur (`line_synth_spur_006`)** at 180–195 %
+  loading. Bump `max_i_ka` from 0.7 to ~1.5 on the spur, or
+  split Therma dispatch across multiple buses.
+- **NegOcc local generation.** Adding 100–200 MW of generation
+  on the NegOcc side of Negros would lift the entire province
+  out of undervoltage at evening peak. Real candidates: La
+  Carlota / Mindanao-Visayas interconnect terminus / additional
+  Cebu plants.
