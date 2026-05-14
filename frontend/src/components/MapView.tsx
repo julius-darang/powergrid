@@ -16,6 +16,7 @@ import { busStyle, lineStyle } from '../viz/encoding'
 import type { Selection } from './InspectPanel'
 import type { Scope } from '../scope'
 import Legend from './Legend'
+import BoundaryLayer from './BoundaryLayer'
 
 const VISAYAS_CENTER: LatLngExpression = [10.7, 123.6]
 const VISAYAS_ZOOM = 7
@@ -23,6 +24,7 @@ const VISAYAS_ZOOM = 7
 interface MapViewProps {
   scenario: ScenarioName | 'topology'
   scope: Scope
+  showBoundaries: boolean
   selection: Selection
   onSelect: (s: Selection) => void
   // Hand the current FeatureCollection back up so the inspect panel can
@@ -31,7 +33,7 @@ interface MapViewProps {
 }
 
 export default function MapView({
-  scenario, scope, selection, onSelect, onDataChange,
+  scenario, scope, showBoundaries, selection, onSelect, onDataChange,
 }: MapViewProps) {
   const [data, setData] = useState<FeatureCollection | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -83,6 +85,10 @@ export default function MapView({
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <BoundaryLayer
+          visible={showBoundaries}
+          highlight={scope.kind === 'province' ? scope.name : null}
         />
         {lines.map((f) => {
           const id = (f.properties as Record<string, unknown>).line_id as string

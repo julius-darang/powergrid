@@ -75,6 +75,10 @@ export const api = {
   scenarios: () => getJSON<ScenariosResponse>('/api/scenarios'),
   provinces: () => getJSON<ProvincesResponse>('/api/provinces'),
   health: () => getJSON<Health>('/api/health'),
+  // Static GeoJSON overlay: PSGC province polygons. Lazy-loaded once
+  // when the user first toggles the boundary layer on; cached client-
+  // side via the endpoint's max-age=86400.
+  provinceBoundaries: () => getJSON<FeatureCollection>('/api/boundaries/provinces'),
 }
 
 // Narrowing helpers — useful at the render boundary where mixed

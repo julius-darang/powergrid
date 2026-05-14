@@ -18,6 +18,7 @@ const MODES: { value: Mode; label: string; help: string }[] = [
 export default function App() {
   const [mode, setMode] = useState<Mode>('topology')
   const [scope, setScope] = useState<Scope>({ kind: 'all' })
+  const [showBoundaries, setShowBoundaries] = useState<boolean>(false)
   const [selection, setSelection] = useState<Selection>(null)
   const [data, setData] = useState<FeatureCollection | null>(null)
 
@@ -75,6 +76,15 @@ export default function App() {
         <div className="header-controls">
           <SyntheticBadge {...syntheticStats} />
 
+          <label className="boundaries-toggle" title="Show PSGC province polygons">
+            <input
+              type="checkbox"
+              checked={showBoundaries}
+              onChange={(e) => setShowBoundaries(e.target.checked)}
+            />
+            <span>Boundaries</span>
+          </label>
+
           <label className="island-filter" title="Filter map to one island">
             <span>Island:</span>
             <select
@@ -115,6 +125,7 @@ export default function App() {
           <MapView
             scenario={mode}
             scope={scope}
+            showBoundaries={showBoundaries}
             selection={selection}
             onSelect={setSelection}
             onDataChange={handleDataChange}

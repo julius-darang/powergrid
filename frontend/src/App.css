@@ -49,6 +49,21 @@
   gap: 12px;
 }
 
+.boundaries-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+}
+
+.boundaries-toggle input {
+  margin: 0;
+  cursor: pointer;
+}
+
 .island-filter {
   display: flex;
   align-items: center;
