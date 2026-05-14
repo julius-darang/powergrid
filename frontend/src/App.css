@@ -1,0 +1,63 @@
+/* Full-bleed layout: header bar on top, map fills the rest. */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #0f172a;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  z-index: 500;
+}
+
+.app-header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.scenario-switch {
+  display: inline-flex;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.scenario-switch button {
+  border: 0;
+  border-right: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 13px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+
+.scenario-switch button:last-child {
+  border-right: 0;
+}
+
+.scenario-switch button:hover {
+  background: #eef2f7;
+}
+
+.scenario-switch button.active {
+  background: #1e3a8a;
+  color: #ffffff;
+}
+
+.app-map {
+  flex: 1;
+  position: relative;
+}
