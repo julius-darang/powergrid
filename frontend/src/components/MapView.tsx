@@ -14,6 +14,7 @@ import {
 } from '../api/client'
 import { busStyle, lineStyle } from '../viz/encoding'
 import type { Selection } from './InspectPanel'
+import Legend from './Legend'
 
 const VISAYAS_CENTER: LatLngExpression = [10.7, 123.6]
 const VISAYAS_ZOOM = 7
@@ -111,6 +112,7 @@ export default function MapView({
         count={data?.features.length ?? 0}
         province={province}
       />
+      <Legend mode={mode} />
     </div>
   )
 }

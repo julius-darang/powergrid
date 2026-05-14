@@ -36,7 +36,13 @@ export default function App() {
   return (
     <div className="app-root">
       <header className="app-header">
-        <h1>Philippine Power Grid · Visayas</h1>
+        <div className="app-title">
+          <h1>Philippine Power Grid</h1>
+          <span className="app-subtitle">
+            Visayas · {mode === 'topology' ? 'topology' : `${MODES.find((m) => m.value === mode)?.label.toLowerCase()} load flow`}
+            {province && <> · <strong>{province}</strong></>}
+          </span>
+        </div>
         <div className="scenario-switch" role="radiogroup" aria-label="Scenario">
           {MODES.map((m) => (
             <button
