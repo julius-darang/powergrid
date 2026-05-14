@@ -377,6 +377,84 @@
   text-align: right;
 }
 
+/* --- Layer control (map overlay, top-left) --- */
+
+.layer-control {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-size: 12px;
+  color: #0f172a;
+  min-width: 200px;
+  user-select: none;
+}
+
+.layer-toggle {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: #334155;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.layer-control.open .layer-toggle {
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 6px 6px 0 0;
+}
+
+.layer-body {
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.layer-row:hover {
+  background: #f1f5f9;
+}
+
+.layer-row input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.layer-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+}
+
+.layer-label {
+  color: #334155;
+}
+
+.layer-divider {
+  margin: 4px 0;
+  height: 1px;
+  background: #e2e8f0;
+}
+
 /* --- Legend (map overlay, bottom-left) --- */
 
 .legend {

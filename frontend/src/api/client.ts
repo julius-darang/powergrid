@@ -60,6 +60,9 @@ async function getJSON<T>(path: string): Promise<T> {
 
 export const api = {
   transmission: () => getJSON<FeatureCollection>('/api/grid/transmission'),
+  // Full system (every bus + line). Used when the layer panel enables
+  // distribution at scope=all. ~3 MB raw, ~600 KB gzipped.
+  allGrid: () => getJSON<FeatureCollection>('/api/grid/all'),
   loadflow: (s: ScenarioName) => getJSON<FeatureCollection>(`/api/loadflow/${s}`),
   // Province-scoped: sub-transmission + distribution within the province
   // (provinceGrid) or the same with load-flow results joined (provinceLoadflow).

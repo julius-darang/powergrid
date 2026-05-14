@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar'
 import InspectPanel, { type Selection } from './components/InspectPanel'
 import { api, type Feature, type FeatureCollection, type ProvincesResponse, type ScenarioName } from './api/client'
 import { type Scope } from './scope'
+import { DEFAULT_LAYERS, type LayerState } from './layers'
 import './App.css'
 
 type Mode = 'topology' | ScenarioName
@@ -19,6 +20,7 @@ export default function App() {
   const [mode, setMode] = useState<Mode>('topology')
   const [scope, setScope] = useState<Scope>({ kind: 'all' })
   const [showBoundaries, setShowBoundaries] = useState<boolean>(false)
+  const [layers, setLayers] = useState<LayerState>(DEFAULT_LAYERS)
   const [selection, setSelection] = useState<Selection>(null)
   const [data, setData] = useState<FeatureCollection | null>(null)
 
@@ -126,6 +128,8 @@ export default function App() {
             scenario={mode}
             scope={scope}
             showBoundaries={showBoundaries}
+            layers={layers}
+            onLayersChange={setLayers}
             selection={selection}
             onSelect={setSelection}
             onDataChange={handleDataChange}

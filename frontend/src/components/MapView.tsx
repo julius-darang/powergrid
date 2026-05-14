@@ -15,8 +15,10 @@ import {
 import { busStyle, lineStyle } from '../viz/encoding'
 import type { Selection } from './InspectPanel'
 import type { Scope } from '../scope'
+import { showBus, showLine, type LayerState } from '../layers'
 import Legend from './Legend'
 import BoundaryLayer from './BoundaryLayer'
+import LayerControl from './LayerControl'
 
 const VISAYAS_CENTER: LatLngExpression = [10.7, 123.6]
 const VISAYAS_ZOOM = 7
@@ -25,6 +27,8 @@ interface MapViewProps {
   scenario: ScenarioName | 'topology'
   scope: Scope
   showBoundaries: boolean
+  layers: LayerState
+  onLayersChange: (next: LayerState) => void
   selection: Selection
   onSelect: (s: Selection) => void
   // Hand the current FeatureCollection back up so the inspect panel can
@@ -33,13 +37,20 @@ interface MapViewProps {
 }
 
 export default function MapView({
-  scenario, scope, showBoundaries, selection, onSelect, onDataChange,
+  scenario, scope, showBoundaries, layers, onLayersChange,
+  selection, onSelect, onDataChange,
 }: MapViewProps) {
   const [data, setData] = useState<FeatureCollection | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  // Six cases: (topology|loadflow) × (all|island|province).
+  // At scope=all + topology, the transmission endpoint is much cheaper
+  // (~150 KB gz vs ~600 KB for /api/grid/all). Only fall back to the
+  // full endpoint when the user actually needs distribution features.
+  const needsFull = layers.distributionLines || layers.distributionBuses
+
+  // Endpoint picker — six cases for loadflow (scope=all/island/province
+  // × scenario), plus all|full split for topology.
   useEffect(() => {
     let cancelled = false
     setLoading(true)
@@ -48,7 +59,7 @@ export default function MapView({
       if (scenario === 'topology') {
         if (scope.kind === 'province') return api.provinceGrid(scope.name)
         if (scope.kind === 'island')   return api.islandGrid(scope.name)
-        return api.transmission()
+        return needsFull ? api.allGrid() : api.transmission()
       }
       if (scope.kind === 'province') return api.provinceLoadflow(scenario, scope.name)
       if (scope.kind === 'island')   return api.islandLoadflow(scenario, scope.name)
@@ -62,15 +73,23 @@ export default function MapView({
       .catch((e) => { if (!cancelled) setError(String(e)) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [scenario, scope, onDataChange])
+  }, [scenario, scope, needsFull, onDataChange])
 
-  const { buses, lines } = useMemo(() => {
-    if (!data) return { buses: [], lines: [] }
-    return {
-      buses: data.features.filter(isBusFeature),
-      lines: data.features.filter(isLineFeature),
+  // Split features and apply the layer filter in one pass. Layer
+  // changes are cheap because they're a JS-side filter — no refetch.
+  const { buses, lines, visibleCount } = useMemo(() => {
+    if (!data) return { buses: [], lines: [], visibleCount: 0 }
+    const buses: Feature[] = []
+    const lines: Feature[] = []
+    for (const f of data.features) {
+      if (isBusFeature(f)) {
+        if (showBus(f, layers)) buses.push(f)
+      } else if (isLineFeature(f)) {
+        if (showLine(f, layers)) lines.push(f)
+      }
     }
-  }, [data])
+    return { buses, lines, visibleCount: buses.length + lines.length }
+  }, [data, layers])
 
   const mode = scenario === 'topology' ? 'topology' : 'loadflow'
 
@@ -82,9 +101,13 @@ export default function MapView({
         style={{ width: '100%', height: '100%' }}
         preferCanvas={true}
       >
+        {/* CartoDB Positron — no labels, no roads, no POIs. Coastlines and
+            water only. Free with attribution. Hosted via fastly. */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={20}
         />
         <BoundaryLayer
           visible={showBoundaries}
@@ -118,10 +141,12 @@ export default function MapView({
         })}
         <FitToData features={data?.features ?? []} active={scope.kind !== 'all'} />
       </MapContainer>
+      <LayerControl layers={layers} onChange={onLayersChange} />
       <StatusOverlay
         loading={loading}
         error={error}
-        count={data?.features.length ?? 0}
+        count={visibleCount}
+        total={data?.features.length ?? 0}
         scope={scope}
       />
       <Legend mode={mode} />
@@ -234,9 +259,10 @@ function LineTooltip({ p }: { p: LineProps }) {
 }
 
 function StatusOverlay({
-  loading, error, count, scope,
-}: { loading: boolean; error: string | null; count: number; scope: Scope }) {
+  loading, error, count, total, scope,
+}: { loading: boolean; error: string | null; count: number; total: number; scope: Scope }) {
   const label = scope.kind === 'all' ? 'Visayas' : scope.name
+  const hidden = total - count
   return (
     <div style={{
       position: 'absolute', top: 8, right: 8, zIndex: 1000,
@@ -248,7 +274,8 @@ function StatusOverlay({
       {!loading && !error && (
         <span>
           {scope.kind === 'all' ? label : <strong>{label}</strong>}
-          {' · '}{count.toLocaleString()} features
+          {' · '}{count.toLocaleString()} shown
+          {hidden > 0 && <span style={{ color: '#64748b' }}> · {hidden.toLocaleString()} hidden</span>}
         </span>
       )}
     </div>
