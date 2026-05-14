@@ -921,3 +921,72 @@ That ratio — minutes of work, fundamental quality improvement —
 is what the Phase 2 closeout's "open threads" enumeration is
 for. The thread had been calling out exactly where to look;
 Day 27 just finally followed the pointer.
+
+## Day 28 — Therma spur retire + NegOcc local generation
+
+Two of the three "parallel calibration threads" from the Phase 2 closeout,
+knocked out before starting the Phase 4 frontend so the load-flow surface
+the map renders is already in a more honest shape.
+
+### What changed
+
+`notebooks/13_pandapower_build.ipynb` only — Phase 1 outputs were not
+touched. Two edits:
+
+1. **Spur override.** Added a `SPUR_OVERRIDES = {'line_synth_spur_006':
+   {'max_i_ka': 1.5}}` table in §3a so the Therma export spur is built at
+   ≈ 358 MVA (1.5 kA × 138 kV × √3) instead of the Phase-1-defaulted ≈ 167
+   MVA. 300 MW gen export at 138 kV draws ~1.26 kA, so 0.7 kA was always
+   structurally undersized.
+2. **NegOcc local generation.** Extended `GEN_DISPATCH_MW` in §4a with
+   `sub_osm_80` (Helios solar cluster, 150 MW at 138 kV) and `v1_06bacolod`
+   (Bacolod biomass aggregate, 80 MW at 230 kV). Total local injection
+   600 → 830 MW; the slack at Ormoc now sits near zero rather than
+   importing 220+ MW through cascading submarines.
+
+The override table is the right primitive: edits live inside Phase 2B
+rather than mutating Phase 1's `synth_v1_lines.csv`. If a future
+Phase 1 re-run regenerates the spur with the right rating, deleting the
+table entry leaves no scar. Same shape used for generator dispatch — the
+dispatch dict is the single place to add or scale.
+
+### Results
+
+| Metric | Pre-Day-28 | Post-Day-28 |
+|---|---:|---:|
+| `line_synth_spur_006` loading (off / morning / evening) | 180.1 / 190.2 / 195.3 % | 83.8 / 83.6 / 83.9 % |
+| NegOcc evening_peak min `vm_pu` | 0.743 | 0.829 |
+| NegOcc evening_peak buses < 0.95 | 190 / 190 (100 %) | 120 / 190 (63 %) |
+| NegOcc evening_peak buses < 0.90 | ≈ 110 / 190 | 46 / 190 |
+| System-wide evening_peak min `vm_pu` | 0.743 | 0.829 |
+| Total in-service local gen | 600 MW | 830 MW |
+
+**Spur:** completely resolved. The closeout's headline calibration overload
+is now a normal high-loading line at ~84 %.
+
+**NegOcc:** materially improved but not fully solved. The closeout's
+estimate ("adding 100–200 MW … would lift the entire province out of
+undervoltage") was optimistic — 230 MW lifts NegOcc out of acute
+undervoltage (< 0.90 dropped from 58 % of buses to 24 %) but not above
+0.95. Diminishing returns past this point: each additional 100 MW
+buys ~0.02 vm_pu, and pushing further crosses into modeling-architecture
+concerns (scenario-specific gen dispatch — Helios solar at 150 MW is
+already unrealistic at evening peak, when PV output is near zero).
+
+**New off-peak overloads.** 3 lines (`line_0080`, `line_0073`,
+`line_0114`) now sit at 115–120 % loading at off-peak, an honest
+side-effect of injecting more local gen and flipping the slack from
+import-heavy to near-balanced. Modest, off-peak only, deferred.
+
+### What this cost
+
+About 90 minutes including the audit. The notebook patch was 20 minutes;
+re-running Phase 2 (skipping Phase 1) was 20 seconds per pass; the
+remaining time was reading the audit output and deciding the diminishing-
+returns stop point.
+
+The pattern that worked: re-run Phase 2 once (with the closeout's
+suggested 130 MW Helios), measure the actual lift, then decide whether
+to keep going. The closeout's number was right to within 2× and saved
+all the framing. The diminishing-returns curve was something only the
+load flow could show.

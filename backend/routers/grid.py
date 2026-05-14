@@ -4,6 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Query
 
 from backend.db.connection import acquire
+from backend.models.schemas import FeatureCollection
 from backend.services.geo import (
     BUS_PROP_COLS, LINE_PROP_COLS,
     fetch_buses, fetch_lines, rows_to_collection,
@@ -12,7 +13,7 @@ from backend.services.geo import (
 router = APIRouter(prefix='/api/grid', tags=['grid'])
 
 
-@router.get('/transmission')
+@router.get('/transmission', response_model=FeatureCollection)
 async def transmission():
     """All transmission buses + lines (>= 60 kV). Single FeatureCollection."""
     async with acquire() as conn:
@@ -27,7 +28,7 @@ async def transmission():
     return {'type': 'FeatureCollection', 'features': feats}
 
 
-@router.get('/province/{province_name}')
+@router.get('/province/{province_name}', response_model=FeatureCollection)
 async def by_province(province_name: str):
     async with acquire() as conn:
         # Existence check — cheap, gives us a clean 404.
@@ -58,7 +59,7 @@ async def by_province(province_name: str):
     return {'type': 'FeatureCollection', 'features': feats}
 
 
-@router.get('/island/{island_name}')
+@router.get('/island/{island_name}', response_model=FeatureCollection)
 async def by_island(island_name: str):
     async with acquire() as conn:
         exists = await conn.fetchval(
@@ -86,7 +87,7 @@ async def by_island(island_name: str):
     return {'type': 'FeatureCollection', 'features': feats}
 
 
-@router.get('/viewport')
+@router.get('/viewport', response_model=FeatureCollection)
 async def viewport(
     minlon: float = Query(...),
     minlat: float = Query(...),

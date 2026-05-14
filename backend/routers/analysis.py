@@ -4,6 +4,9 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from backend.db.connection import acquire
+from backend.models.schemas import (
+    FeatureCollection, Health, ProvincesResponse, ScenariosResponse,
+)
 from backend.services.geo import (
     BUS_PROP_COLS, LINE_PROP_COLS, rows_to_collection,
 )
@@ -44,7 +47,7 @@ _LINE_LOADFLOW_SQL = (
 )
 
 
-@router.get('/api/loadflow/{scenario}')
+@router.get('/api/loadflow/{scenario}', response_model=FeatureCollection)
 async def loadflow(scenario: str):
     _check_scenario(scenario)
     async with acquire() as conn:
@@ -57,7 +60,7 @@ async def loadflow(scenario: str):
     return {'type': 'FeatureCollection', 'features': feats}
 
 
-@router.get('/api/loadflow/{scenario}/{province}')
+@router.get('/api/loadflow/{scenario}/{province}', response_model=FeatureCollection)
 async def loadflow_province(scenario: str, province: str):
     _check_scenario(scenario)
     async with acquire() as conn:
@@ -91,7 +94,7 @@ async def loadflow_province(scenario: str, province: str):
     return {'type': 'FeatureCollection', 'features': feats}
 
 
-@router.get('/api/provinces')
+@router.get('/api/provinces', response_model=ProvincesResponse)
 async def provinces():
     """Sidebar payload: per-province counts and total connected load.
 
@@ -120,7 +123,7 @@ async def provinces():
     return {'provinces': [dict(r) for r in rows]}
 
 
-@router.get('/api/scenarios')
+@router.get('/api/scenarios', response_model=ScenariosResponse)
 async def scenarios():
     """Available scenarios with the convergence mode actually used."""
     # convergence_mode is per-row in load_flow_results, but in practice
@@ -147,7 +150,7 @@ async def scenarios():
     }
 
 
-@router.get('/api/health')
+@router.get('/api/health', response_model=Health)
 async def health():
     async with acquire() as conn:
         db_version = await conn.fetchval('SELECT version()')
