@@ -1,17 +1,17 @@
 province,total_buses,in_service_buses,total_load_mw,in_service_load_mw,coverage_pct
 Cebu,979,411,720.0,298.6,42.0
-Leyte,483,194,200.0,80.4,40.2
+Leyte,744,485,200.0,130.3,65.2
 Negros Occidental,316,190,320.0,192.0,60.1
 Negros Oriental,262,118,160.0,71.5,45.0
 Bohol,251,182,120.0,86.8,72.5
+Samar,163,72,90.0,37.4,44.2
 Iloilo,158,0,250.0,0.0,0.0
-Samar,158,46,90.0,25.4,29.1
-Northern Samar,71,20,65.0,17.7,28.2
-Eastern Samar,65,25,45.0,22.5,38.5
-Southern Leyte,57,38,40.0,25.3,66.7
+Northern Samar,78,27,65.0,17.7,34.6
+Eastern Samar,68,28,45.0,22.5,41.2
+Southern Leyte,61,42,40.0,25.3,68.9
 Aklan,46,0,75.0,0.0,0.0
 Antique,25,0,55.0,0.0,0.0
 Capiz,25,0,80.0,0.0,0.0
 Siquijor,23,0,15.0,0.0,0.0
+Biliran,21,2,22.0,0.0,9.5
 Guimaras,21,0,25.0,0.0,0.0
-Biliran,19,0,22.0,0.0,0.0

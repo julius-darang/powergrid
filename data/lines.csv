@@ -58,3 +58,39 @@ name,cables,bus0,bus1,s_nom,x,r,region,description
 69_07UBAY_07TAPAL,1,07UBAY,07TAPAL,69,1.875327224,0.305011973,Visayas,69 kV single-circuit transmission line in Central Visayas/Bohol
 138_07UBAY_07CORELLA,1,07UBAY,07CORELLA,138,12.08919693,8.512957816,Visayas,138 kV single-circuit transmission line in Central Visayas/Bohol
 69_07UBAY_07CORELLA,1,07UBAY,07CORELLA,69,33.85758894,5.506756303,Visayas,69 kV single-circuit transmission line in Central Visayas/Bohol
+69_04ALLEN_04SANISIDRO,1,04ALLEN,04SANISIDRO,69,6.624,1.078,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Samar (Allen-San Isidro coastal radial)
+69_04ALLEN_04BOBON,1,04ALLEN,04BOBON,69,14.352,2.335,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Samar (Allen-Bobon, planned NGCP loop segment)
+69_04BOBON_04CATARMAN,1,04BOBON,04CATARMAN,69,4.032,0.656,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Samar
+69_04CATARMAN_04BOBOLOSAN,1,04CATARMAN,04BOBOLOSAN,69,2.774,0.451,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Samar
+69_04SANISIDRO_04LOPEDEVEGA,1,04SANISIDRO,04LOPEDEVEGA,69,15.984,2.601,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Samar (radial inland to Lope de Vega / Palanas Cara)
+69_04LOPEDEVEGA_04CALBAYOG69,1,04LOPEDEVEGA,04CALBAYOG69,69,13.042,2.122,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Samar (Lope de Vega-Calbayog)
+69_04CALBAYOG69_04CAPOOCAN,1,04CALBAYOG69,04CAPOOCAN,69,2.851,0.464,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Samar
+69_04CAPOOCAN_04SANAGUSTINS,1,04CAPOOCAN,04SANAGUSTINS,69,12.461,2.028,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Samar
+69_04SANAGUSTINS_04CATBALOGAN,1,04SANAGUSTINS,04CATBALOGAN,69,12.005,1.953,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Samar
+69_04CATBALOGAN_04PARANAS69,1,04CATBALOGAN,04PARANAS69,69,8.054,1.311,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Samar
+69_04PARANAS69_04TAFT,1,04PARANAS69,04TAFT,69,20.899,3.401,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Eastern Samar (cross-island spur to Pacific coast)
+69_04TAFT_04BORONGAN,1,04TAFT,04BORONGAN,69,15.840,2.577,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Eastern Samar
+69_04BORONGAN_04QUINAPONDAN,1,04BORONGAN,04QUINAPONDAN,69,24.432,3.975,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Eastern Samar
+69_04QUINAPONDAN_04STARITA69,1,04QUINAPONDAN,04STARITA69,69,29.932,4.870,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Eastern Samar (Quinapondan-Sta. Rita cross-island spur closure)
+138_04CALBAYOG_04CALBAYOG69,1,04CALBAYOG,04CALBAYOG69,138,0.070,0.050,Visayas,138/69 kV step-down transformer/short tie at Calbayog substation, Samar
+138_04PARANAS_04PARANAS69,1,04PARANAS,04PARANAS69,138,0.070,0.050,Visayas,138/69 kV step-down transformer/short tie at Paranas substation, Samar
+138_04STARITA_04STARITA69,1,04STARITA,04STARITA69,138,0.070,0.050,Visayas,138/69 kV step-down transformer/short tie at Santa Rita substation, Samar
+69_04BABATNGN69_04PALO,1,04BABATNGN69,04PALO,69,10.705,1.742,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Leyte
+69_04PALO_04TOLOSA,1,04PALO,04TOLOSA,69,5.670,0.923,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Leyte
+69_04BABATNGN69_04TUNGA,1,04BABATNGN69,04TUNGA,69,11.998,1.952,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Leyte (Tunga radial on Babatngon-Ormoc corridor)
+69_04ISABEL69_04TALISAYAN,1,04ISABEL69,04TALISAYAN,69,12.978,2.112,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Leyte (central spine north tap)
+69_04TALISAYAN_04SANAGUSTINL,1,04TALISAYAN,04SANAGUSTINL,69,10.220,1.663,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Leyte (central spine)
+69_04SANAGUSTINL_04BAYBAY,1,04SANAGUSTINL,04BAYBAY,69,4.920,0.801,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Leyte (central spine)
+69_04BAYBAY_04JAVIER,1,04BAYBAY,04JAVIER,69,11.061,1.800,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Leyte (Javier east branch)
+69_04BAYBAY_04HILONGOS,1,04BAYBAY,04HILONGOS,69,17.746,2.887,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Leyte (central spine south)
+69_04HILONGOS_04MAASIN69,1,04HILONGOS,04MAASIN69,69,9.726,1.582,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Leyte (central spine south tap)
+69_04MAASIN69_04BONTOC,1,04MAASIN69,04BONTOC,69,14.326,2.331,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Southern Leyte (Maasin-Bontoc cross-island)
+69_04BONTOC_04HIMAYANGAN,1,04BONTOC,04HIMAYANGAN,69,11.119,1.809,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Southern Leyte
+69_04HIMAYANGAN_04STBERNARD,1,04HIMAYANGAN,04STBERNARD,69,4.856,0.790,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Southern Leyte (east coast arm)
+69_04TABANGO69_04SAMBULAWAN,1,04TABANGO69,04SAMBULAWAN,69,9.627,1.566,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Northern Leyte (Biliran feed)
+69_04SAMBULAWAN_04BILIRAN,1,04SAMBULAWAN,04BILIRAN,69,14.124,2.298,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Biliran (mainland-island crossing)
+69_04BILIRAN_04NAVAL,1,04BILIRAN,04NAVAL,69,6.491,1.056,Visayas,69 kV single-circuit transmission line in Eastern Visayas/Biliran
+138_04BABATNGN_04BABATNGN69,1,04BABATNGN,04BABATNGN69,138,0.070,0.050,Visayas,138/69 kV step-down transformer/short tie at Babatngon substation, Leyte
+138_04ISABEL_04ISABEL69,1,04ISABEL,04ISABEL69,138,0.070,0.050,Visayas,138/69 kV step-down transformer/short tie at Isabel substation, Leyte
+138_04MAASIN_04MAASIN69,1,04MAASIN,04MAASIN69,138,0.070,0.050,Visayas,138/69 kV step-down transformer/short tie at Maasin substation, Southern Leyte
+230_04TABANGO_04TABANGO69,1,04TABANGO,04TABANGO69,230,0.080,0.060,Visayas,230/69 kV step-down transformer/short tie at Tabango substation, Northern Leyte

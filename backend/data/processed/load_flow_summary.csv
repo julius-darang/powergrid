@@ -1,4 +1,4 @@
 scenario,factor,mode,wall_s,load_mw_in_svc,gen_mw,slack_p_mw,vm_pu_min,vm_pu_max,line_load_max_pct,trafo_load_max_pct
-off_peak,0.4,nr,0.03,328.1,830.0,-458.6,0.93,1.02,118.5,119.6
-morning_peak,0.85,nr,0.02,697.2,830.0,-95.2,0.85,1.02,112.6,88.2
-evening_peak,0.95,nr,0.03,779.2,830.0,-11.2,0.829,1.02,113.5,87.2
+off_peak,0.4,nr,0.03,352.9,830.0,-429.7,0.859,1.02,118.7,119.9
+morning_peak,0.85,dc,0.36,749.9,830.0,-80.1,,,107.5,85.0
+evening_peak,0.95,dc,0.36,838.1,830.0,8.1,,,107.3,83.2

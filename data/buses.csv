@@ -1,15 +1,48 @@
 name,x,y,v_nom,region,description,island,bus_type
-04BABATNGN,124.8966993,11.39550084,138,Visayas,"Babatngon substation, Northern Leyte",Leyte,substation
+04ALLEN,124.289503,12.503229,69,Visayas,"Allen substation, Northern Samar (LVIP HVDC terminal site; 69 kV side only modeled here)",Samar,substation
+04BABATNGN,124.9508,11.3565,138,Visayas,"Babatngon substation, Northern Leyte (coords from OSM way/245371561; previous coord 124.8967, 11.3955 was ~5.6 km off)",Leyte,substation
+04BABATNGN69,124.9508,11.3565,69,Visayas,"Babatngon 69 kV substation, Leyte (colocated with 04BABATNGN 138 kV; Northern Leyte 69 kV tap)",Leyte,substation
+04BAYBAY,124.79775,10.6778,69,Visayas,"Baybay substation, Leyte (approximate; municipality center)",Leyte,substation
+04BILIRAN,124.4741,11.46657,69,Visayas,"Biliran substation, Biliran province (near BilECo per OSM way/524168637; approximate)",Leyte,substation
+04BOBOLOSAN,124.65,12.55,69,Visayas,"Bobolosan substation, Northern Samar (NGCP-internal name; approximate coords pending field verification)",Samar,substation
+04BOBON,124.564198,12.52578,69,Visayas,"Bobon substation, Northern Samar (approximate; municipality center)",Samar,substation
+04BONTOC,124.97061,10.35439,69,Visayas,"Bontoc substation, Southern Leyte (approximate; municipality center)",Leyte,substation
+04BORONGAN,125.432243,11.607985,69,Visayas,"Borongan substation, Eastern Samar (approximate; municipality center)",Samar,substation
 04CALBAYOG,124.6379129,12.05513914,138,Visayas,"Calbayog substation, Samar",Samar,substation
+04CALBAYOG69,124.6379129,12.05513914,69,Visayas,"Calbayog 69 kV substation, Samar (colocated with 04CALBAYOG 138 kV)",Samar,substation
+04CAPOOCAN,124.584561,12.067171,69,Visayas,"Capoocan substation, Northern Samar (Samar site per OSM Way/263568246, not the Leyte Capoocan)",Samar,substation
+04CATARMAN,124.636477,12.499648,69,Visayas,"Catarman substation, Northern Samar (provincial capital; approximate)",Samar,substation
+04CATBALOGAN,124.887273,11.775783,69,Visayas,"Catbalogan substation, Samar (OSM Node/1833989959, provincial capital)",Samar,substation
+04HILONGOS,124.78264,10.34506,69,Visayas,"Hilongos substation, Leyte (OSM way/246264171; unnamed substation near Hilongos/Bato)",Leyte,substation
+04HIMAYANGAN,125.10665,10.19428,69,Visayas,"Himayangan substation, Southern Leyte (approximate; barangay in Liloan)",Leyte,substation
 04ISABEL,124.4489301,10.91933332,138,Visayas,"Isabel substation, Leyte (Leyte geothermal connection)",Leyte,substation
+04ISABEL69,124.4489301,10.91933332,69,Visayas,"Isabel 69 kV substation, Leyte (colocated with 04ISABEL 138 kV per OSM way/160725185)",Leyte,substation
+04JAVIER,124.98548,10.77308,69,Visayas,"Javier substation, Leyte (OSM relation/17811811, DORELCO Javier)",Leyte,substation
 04KANANGA,124.5513085,11.16499313,230,Visayas,"Kananga substation, Leyte",Leyte,substation
+04LOPEDEVEGA,124.624999,12.299543,69,Visayas,"Lope de Vega substation, Northern Samar (NGCP-internal name 'Palanas Cara'; approximate coords)",Samar,substation
 04MAASIN,124.7791313,10.16255469,138,Visayas,"Maasin substation, Southern Leyte",Leyte,substation
+04MAASIN69,124.7791313,10.16255469,69,Visayas,"Maasin 69 kV substation, Southern Leyte (colocated with 04MAASIN 138 kV per OSM way/245298515)",Leyte,substation
+04NAVAL,124.39653,11.56179,69,Visayas,"Naval substation, Biliran province (approximate; provincial capital)",Leyte,substation
 04ORMOC,124.6446783,11.08748498,350,Visayas,"Ormoc 350 kV substation, Leyte",Leyte,hvdc
+04PALO,124.99081,11.15945,69,Visayas,"Palo substation, Leyte (approximate; municipality center near Tacloban)",Leyte,substation
 04PARANAS,125.0413517,11.76675071,138,Visayas,"Paranas substation, Samar",Samar,substation
+04PARANAS69,125.0413517,11.76675071,69,Visayas,"Paranas 69 kV substation, Samar (colocated with 04PARANAS 138 kV)",Samar,substation
+04QUINAPONDAN,125.521297,11.157755,69,Visayas,"Quinapondan substation, Eastern Samar (approximate; municipality center)",Samar,substation
+04SAMBULAWAN,124.47943,11.20153,69,Visayas,"Sambulawan substation, Leyte (approximate; barangay in Villaba between mainland and Biliran)",Leyte,substation
+04SANAGUSTINL,124.7859,10.76941,69,Visayas,"San Agustin substation, Leyte (approximate; barangay in Baybay City; distinct from Samar San Agustin)",Leyte,substation
+04SANAGUSTINS,124.809433,11.987853,69,Visayas,"San Agustin substation, Samar (approximate; municipality center)",Samar,substation
+04SANISIDRO,124.330598,12.385418,69,Visayas,"San Isidro substation, Northern Samar (approximate; municipality center)",Samar,substation
 04STARITA,125.0020505,11.39500758,138,Visayas,"Santa Rita substation, Samar",Samar,substation
+04STARITA69,125.0020505,11.39500758,69,Visayas,"Santa Rita 69 kV substation, Samar (colocated with 04STARITA 138 kV; Eastern Samar spur terminus)",Samar,substation
 04STARITATAP,125.0020505,11.39500758,138,Visayas,"Santa Rita tap substation, Samar",Samar,substation
+04STBERNARD,125.13949,10.27949,69,Visayas,"St. Bernard substation, Southern Leyte (approximate; municipality center)",Leyte,substation
 04TABANGO,124.3434864,11.32347232,230,Visayas,"Tabango substation, Northern Leyte",Leyte,substation
+04TABANGO69,124.3434864,11.32347232,69,Visayas,"Tabango 69 kV substation, Northern Leyte (colocated with 04TABANGO 230 kV per OSM way/506201692)",Leyte,substation
+04TAFT,125.416416,11.904913,69,Visayas,"Taft substation, Eastern Samar (approximate; municipality center)",Samar,substation
+04TALISAYAN,124.69614,10.93977,69,Visayas,"Talisayan substation, Leyte (NGCP tap; barangay in Albuera; approximate)",Leyte,substation
+04TOLOSA,125.03759,11.06344,69,Visayas,"Tolosa substation, Leyte (approximate; municipality center)",Leyte,substation
 04TONGONA,124.6375583,11.16131421,138,Visayas,"Tongonan geothermal plant substation, Leyte",Leyte,generator
+04TUNGA,124.75078,11.24589,69,Visayas,"Tunga substation, Leyte (approximate; municipality center; on Babatngon-Ormoc corridor)",Leyte,substation
 05CALUNG,123.6671074,10.41572975,138,Visayas,"Calung substation, Cebu",Cebu,substation
 05CEBU,123.9408559,10.36522781,138,Visayas,"Cebu main substation, Cebu City",Cebu,substation
 05COLON,123.7598772,10.22268355,138,Visayas,"Colon substation, Cebu City",Cebu,substation

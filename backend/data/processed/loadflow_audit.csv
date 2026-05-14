@@ -1,28 +1,31 @@
 scenario,province,bus_count,vm_pu_min,vm_pu_mean,vm_pu_max,n_under_0p95,n_over_1p05,va_min_deg,va_max_deg,mode
-evening_peak,Bohol,182,0.871,0.945,1.005,101,0,-4.69,2.08,nr
-evening_peak,Cebu,411,0.865,0.941,1.0,243,0,-0.07,10.63,nr
-evening_peak,Eastern Samar,25,0.895,0.941,0.983,17,0,-5.98,-2.6,nr
-evening_peak,Leyte,194,0.937,0.988,1.02,8,0,-1.51,8.35,nr
-evening_peak,Negros Occidental,190,0.829,0.928,1.0,120,0,-0.06,12.84,nr
-evening_peak,Negros Oriental,118,0.895,0.96,1.0,42,0,4.59,10.22,nr
-evening_peak,Northern Samar,20,0.953,0.993,1.019,0,0,-2.36,-0.08,nr
-evening_peak,Samar,46,0.928,0.965,1.009,11,0,-4.37,-0.79,nr
-evening_peak,Southern Leyte,38,0.964,0.995,1.013,0,0,-1.82,-0.05,nr
-morning_peak,Bohol,182,0.888,0.952,1.006,84,0,-2.99,3.63,nr
-morning_peak,Cebu,411,0.879,0.947,1.0,211,0,1.88,12.91,nr
-morning_peak,Eastern Samar,25,0.91,0.95,0.987,13,0,-5.27,-2.31,nr
-morning_peak,Leyte,194,0.943,0.99,1.02,4,0,-1.35,9.29,nr
-morning_peak,Negros Occidental,190,0.85,0.936,1.0,115,0,3.21,15.32,nr
-morning_peak,Negros Oriental,118,0.907,0.965,1.0,31,0,7.85,12.97,nr
-morning_peak,Northern Samar,20,0.96,0.996,1.019,0,0,-2.1,-0.07,nr
-morning_peak,Samar,46,0.938,0.972,1.01,3,0,-3.87,-0.7,nr
-morning_peak,Southern Leyte,38,0.97,0.997,1.013,0,0,-1.47,0.19,nr
-off_peak,Bohol,182,0.949,0.974,1.01,1,0,1.29,10.42,nr
-off_peak,Cebu,411,0.934,0.966,1.0,31,0,10.29,23.15,nr
-off_peak,Eastern Samar,25,0.971,0.989,1.005,0,0,-2.36,-1.08,nr
-off_peak,Leyte,194,0.961,0.996,1.02,0,0,-0.63,13.44,nr
-off_peak,Negros Occidental,190,0.93,0.968,1.0,30,0,16.36,26.18,nr
-off_peak,Negros Oriental,118,0.956,0.983,1.0,0,0,21.95,24.97,nr
-off_peak,Northern Samar,20,0.993,1.009,1.02,0,0,-0.96,-0.03,nr
-off_peak,Samar,46,0.983,0.998,1.016,0,0,-1.76,-0.33,nr
-off_peak,Southern Leyte,38,0.991,1.004,1.012,0,0,0.02,1.24,nr
+evening_peak,Biliran,2,,,,,,2.98,2.98,dc
+evening_peak,Bohol,182,,,,,,-5.16,2.21,dc
+evening_peak,Cebu,411,,,,,,-0.59,10.94,dc
+evening_peak,Eastern Samar,28,,,,,,-8.54,-3.5,dc
+evening_peak,Leyte,485,,,,,,-20.71,8.87,dc
+evening_peak,Negros Occidental,190,,,,,,-0.06,12.94,dc
+evening_peak,Negros Oriental,118,,,,,,4.52,10.78,dc
+evening_peak,Northern Samar,27,,,,,,-3.31,-0.09,dc
+evening_peak,Samar,72,,,,,,-15.35,-1.11,dc
+evening_peak,Southern Leyte,42,,,,,,-3.88,-0.14,dc
+morning_peak,Biliran,2,,,,,,4.32,4.32,dc
+morning_peak,Bohol,182,,,,,,-3.52,3.71,dc
+morning_peak,Cebu,411,,,,,,1.32,13.09,dc
+morning_peak,Eastern Samar,28,,,,,,-7.64,-3.13,dc
+morning_peak,Leyte,485,,,,,,-18.37,9.77,dc
+morning_peak,Negros Occidental,190,,,,,,2.94,15.29,dc
+morning_peak,Negros Oriental,118,,,,,,7.6,13.33,dc
+morning_peak,Northern Samar,27,,,,,,-2.96,-0.08,dc
+morning_peak,Samar,72,,,,,,-13.74,-1.0,dc
+morning_peak,Southern Leyte,42,,,,,,-3.32,0.12,dc
+off_peak,Biliran,2,0.969,0.969,0.969,0.0,0.0,10.11,10.11,nr
+off_peak,Bohol,182,0.948,0.974,1.009,1.0,0.0,1.21,10.38,nr
+off_peak,Cebu,411,0.934,0.966,1.0,35.0,0.0,10.24,23.13,nr
+off_peak,Eastern Samar,28,0.965,0.984,1.0,0.0,0.0,-3.3,-1.39,nr
+off_peak,Leyte,485,0.859,0.961,1.02,139.0,0.0,-8.26,13.54,nr
+off_peak,Negros Occidental,190,0.929,0.967,1.0,30.0,0.0,16.33,26.15,nr
+off_peak,Negros Oriental,118,0.956,0.983,1.0,0.0,0.0,21.93,24.94,nr
+off_peak,Northern Samar,27,0.993,1.007,1.02,0.0,0.0,-1.25,-0.03,nr
+off_peak,Samar,72,0.913,0.975,1.014,22.0,0.0,-5.91,-0.44,nr
+off_peak,Southern Leyte,42,0.99,1.002,1.011,0.0,0.0,-1.05,1.16,nr
