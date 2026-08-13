@@ -15,6 +15,7 @@ venv/
 .DS_Store
 .vscode/
 .idea/
+.claude/
 
 # --- Data caches & large binaries ---
 # osmnx HTTP response cache; safe to delete, will re-download on next run
