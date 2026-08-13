@@ -28,6 +28,25 @@ async def transmission():
     return {'type': 'FeatureCollection', 'features': feats}
 
 
+@router.get('/all', response_model=FeatureCollection)
+async def all_grid():
+    """Full system: every bus + line, no voltage filter.
+
+    ~6000 features (3000 each). Used when the frontend layer panel
+    enables distribution at scope=all — there's no way to render
+    distribution feeders without pulling them. ~3 MB raw, ~600 KB on
+    the wire via GZipMiddleware.
+    """
+    async with acquire() as conn:
+        buses = await fetch_buses(conn)
+        lines = await fetch_lines(conn)
+    feats = (
+        rows_to_collection(buses, BUS_PROP_COLS)['features']
+        + rows_to_collection(lines, LINE_PROP_COLS)['features']
+    )
+    return {'type': 'FeatureCollection', 'features': feats}
+
+
 @router.get('/province/{province_name}', response_model=FeatureCollection)
 async def by_province(province_name: str):
     async with acquire() as conn:

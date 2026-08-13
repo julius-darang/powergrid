@@ -123,3 +123,19 @@ def test_loadflow_province_scoped(client, sample_province):
     # Every bus in the response belongs to the requested province.
     for f in bus_feats:
         assert f['properties']['province'] == sample_province
+
+
+def test_loadflow_island_scoped(client):
+    # Cebu island always has data — it's a core Phase 1 region.
+    r = client.get('/api/loadflow/evening_peak/island/Cebu')
+    assert r.status_code == 200, r.text
+    feats = r.json()['features']
+    bus_feats = [f for f in feats if f['geometry'] and f['geometry']['type'] == 'Point']
+    assert bus_feats, 'no buses in Cebu island loadflow'
+    for f in bus_feats:
+        assert f['properties']['island'] == 'Cebu'
+
+
+def test_island_404(client):
+    r = client.get('/api/loadflow/evening_peak/island/Atlantis')
+    assert r.status_code == 404
