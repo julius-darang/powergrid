@@ -121,9 +121,10 @@ rubric.
   `backend/models/schemas.py`, `backend/tests/test_api.py` now
   populated. Nine endpoints live and verified. See
   [phase-3-api.md Day 27](../journal/phase-3-api.md).
-- **Empty frontend scaffolding.** `frontend/src/components/`,
-  `frontend/src/hooks/` still empty. No React, no Leaflet.
-  Phase 4 work.
+- **Frontend was not started at the Phase 2 closeout.** Phase 4 has since
+  added a Vite + React + react-leaflet walking skeleton in `frontend/`,
+  including map rendering, scenario/layer controls, boundary filtering,
+  inspection panels, and typed API access. See [`frontend/README.md`](../../frontend/README.md).
 
 ## Resolved during Phase 2
 

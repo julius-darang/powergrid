@@ -12,7 +12,7 @@ docs/
     README.md
     phase-1-data.md           ← Days 1–20, Phase 1 data foundation
     phase-2-loadflow.md       ← Phase 2 topology + load flow
-    phase-3-api.md            (stub)
+    phase-3-api.md            FastAPI scaffold and endpoint notes
     phase-4-frontend.md       (stub)
     phase-5-polish.md         (stub)
   closeouts/                  ← phase handoff documents (one screen each)
@@ -25,8 +25,8 @@ docs/
 | ----- | ---------------------------------------------- | --------------------------------------------------- | ----------- |
 | 1     | [phase-1-data.md](phase-1-data.md)             | [phase-1-closeout.md](../closeouts/phase-1-closeout.md) | **done** (Day 27 recal) |
 | 2     | [phase-2-loadflow.md](phase-2-loadflow.md)     | [phase-2-closeout.md](../closeouts/phase-2-closeout.md) | **done**    |
-| 3     | [phase-3-api.md](phase-3-api.md)               | —                                                   | scaffolded  |
-| 4     | Frontend                                       | —                                                   | not started |
+| 3     | [phase-3-api.md](phase-3-api.md)               | —                                                   | **done**    |
+| 4     | [frontend/README.md](../../frontend/README.md) | —                                                   | **underway** |
 | 5     | Polish                                         | —                                                   | not started |
 
 ## Current state in one line
@@ -38,7 +38,8 @@ evening-peak 0.743). Phase 3 FastAPI scaffold is live and
 verified — nine endpoints serving GeoJSON + load-flow JSON
 from PostGIS, two pytest sanity tests passing.
 `scripts/run_phase1.py` (~39 s) and `scripts/run_phase2.py`
-(~23 s) rebuild from raw OSM end-to-end. See
+(~23 s) rebuild from raw OSM end-to-end. The Phase 4 frontend walking skeleton
+is in `frontend/` and builds with Vite. See
 [phase-2-loadflow.md](phase-2-loadflow.md) Day 27 for the
 recalibration story and [phase-3-api.md](phase-3-api.md) for
 the API scaffold.

@@ -19,7 +19,9 @@ the Phase 1 handoff is at [`docs/closeouts/phase-1-closeout.md`](docs/closeouts/
 (2 967 rows). Visayas total peak load = 2 282 MW, within 4 % of the
 published ~2 200 MW. Full pipeline runs end-to-end in ~34 s.
 
-Phase 2 (topology validation + load flow) — not started.
+Phase 2 (topology validation + load flow) — done. Phase 3 (FastAPI + PostGIS)
+— done, with nine endpoints and passing API sanity tests. Phase 4 frontend is
+underway as a Vite + React + react-leaflet walking skeleton in `frontend/`.
 
 ## Prerequisites
 
@@ -80,9 +82,9 @@ backend/
     processed/    The Phase 1 deliverable: buses.csv, lines.csv,
                   plus per-step summary CSVs
   db/init.sql     PostGIS schema (live but empty)
-  services/       Empty — Phase 2 promotion target
-  routers/        Empty
-  models/         Empty
+  services/       Phase 2/3 service layer
+  routers/        FastAPI routes for grid, analysis, and boundaries
+  models/         API/data models
 
 notebooks/        01–12 (00 = boundary prep, 01 = OSM extract,
                   05 = coverage audit; 02, 03, 04, 06, 07, 08, 11,
@@ -93,6 +95,8 @@ scripts/
 docs/
   journal/        Per-phase developer journal
   closeouts/      Per-phase handoff documents (one screen each)
+
+frontend/         React + Vite + react-leaflet frontend (Phase 4)
 
 data/             Upstream v1 dataset of 53 NGCP substations
                   (buses.csv, lines.csv, admin_regions.csv)

@@ -115,17 +115,19 @@ runs end-to-end in ~39 s via `python scripts/run_phase1.py`.
 
 ### Process residuals
 
-- **Empty scaffolding remains.** `backend/services/`,
-  `backend/routers/`, `backend/models/`, `frontend/src/components/`,
-  `frontend/src/hooks/` are still empty. Orchestrator made Phase 1
-  reliable from notebooks, so promotion is no longer urgent — but
-  it remains the right Phase 2 refactor.
+- **At the Phase 1 closeout, scaffolding was empty.** `backend/services/`,
+  `backend/routers/`, `backend/models/`, `frontend/src/components/`, and
+  `frontend/src/hooks/` were empty at that historical point. The orchestrator
+  made Phase 1 reliable from notebooks; later Phase 3/4 work populated the
+  backend and added the frontend walking skeleton.
 
   > **Update (Phase 3 Day 27).** Backend scaffolding populated by
   > the Phase 3 FastAPI scaffold (`backend/main.py`,
   > `backend/db/connection.py`, `backend/routers/`,
   > `backend/services/`, `backend/models/`, `backend/tests/`).
-  > Frontend dirs still empty — Phase 4 work.
+  > Frontend was still empty at this closeout; Phase 4 has since added a
+  > Vite + React + react-leaflet walking skeleton under `frontend/`. See
+  > [`frontend/README.md`](../../frontend/README.md).
 
 - **No rows in PostGIS.** Schema is live but empty. The loader
   pass reads `buses.csv` / `lines.csv` into Postgres and measures
