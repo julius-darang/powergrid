@@ -6,7 +6,7 @@ status: dormant
 stack: PostGIS · FastAPI · pandapower · React + Vite + react-leaflet · Docker
 entry: scripts/run_phase1.py · scripts/run_phase2.py  (NEVER run notebooks individually) · frontend/ (npm run dev · npm run build)
 has_repo: true
-updated: 2026-08-14
+updated: 2026-08-16
 ---
 
 # powergrid
